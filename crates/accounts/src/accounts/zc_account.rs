@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountInfo, ToAccountInfo, Key};
-use pinocchio::{account_info::{AccountInfo, Ref, RefMut}, pubkey::Pubkey};
+use pinocchio::{account_info::{AccountInfo, Ref, RefMut}, instruction::Signer, pubkey::Pubkey};
 use jutsu_errors::Result;
-use jutsu_ser::ZcDeserialize;
+use jutsu_ser::{InitAccounts, ZcDeserialize};
 pub struct ZcAccount<'a, T>
 where 
     T: ZcDeserialize,
@@ -26,6 +26,11 @@ where
     #[inline(always)]
     pub fn try_deserialize_zc_mut(&self) -> Result<RefMut<'a, T>> {
         T::try_deserialize_zc_mut(self.account_info)
+    }
+
+    #[inline(always)]
+    pub fn try_initialize_zc(init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>> {
+        T::try_initialize_zc(init_accounts, signers)
     }
 }
 
