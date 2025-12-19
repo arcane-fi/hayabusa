@@ -55,3 +55,9 @@ where
         self.account_info.key()
     }
 }
+
+pub struct System;
+
+impl ProgramId for System {
+    const ID: Pubkey = pinocchio_system::ID;
+}
