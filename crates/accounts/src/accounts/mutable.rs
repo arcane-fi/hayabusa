@@ -59,10 +59,10 @@ impl<'a, T> core::ops::Deref for Mut<'a, T>
 where 
     T: FromAccountInfo<'a> + ToAccountInfo<'a> + Key,
 {
-    type Target = AccountInfo;
+    type Target = T;
 
     #[inline(always)]
-    fn deref(&self) -> &'a Self::Target {
-        self.account.to_account_info()
+    fn deref(&self) -> &Self::Target {
+        &self.account
     }
 }
