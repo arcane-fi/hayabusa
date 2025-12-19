@@ -18,7 +18,7 @@ pub fn derive_discriminator(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl Discriminator for #name {
-            const DISCRIMINATOR: [u8; 8] = [#(#discriminator),*];
+            const DISCRIMINATOR: &'static [u8] = [#(#discriminator),*];
         }
     };
 

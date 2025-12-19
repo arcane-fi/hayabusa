@@ -4,5 +4,5 @@
 #![no_std]
 
 pub trait Discriminator {
-    const DISCRIMINATOR: [u8; 8];
+    const DISCRIMINATOR: &'static [u8];
 }
