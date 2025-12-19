@@ -15,9 +15,9 @@ macro_rules! dispatch {
         const DISC_LEN: usize = 8;
 
         if $ix_data.len() < DISC_LEN {
-            $crate::fail_with_ctx!(
+            fail_with_ctx!(
                 "JUTSU_DISPATCH_IX_DATA_LEN",
-                $crate::ErrorCode::UnknownInstruction,
+                ErrorCode::UnknownInstruction,
             );
         }
 
@@ -27,18 +27,18 @@ macro_rules! dispatch {
             if disc == <$IxTy>::DISCRIMINATOR {
                 let ix = bytemuck::try_from_bytes::<$IxTy>(rest)
                     .map_err(|_| {
-                        $crate::pinocchio::program_error::ProgramError::InvalidInstructionData
+                        pinocchio::program_error::ProgramError::InvalidInstructionData
                     })?;
 
-                let ctx = $crate::Context::construct($accounts)?;
+                let ctx = Context::construct($accounts)?;
                 return $handler(ctx, $(ix.$field),*)
                     .map_err(Into::into);
             }
         )+
 
-        $crate::fail_with_ctx!(
+        fail_with_ctx!(
             "JUTSU_DISPATCH_UNKNOWN_IX",
-            $crate::ErrorCode::UnknownInstruction,
+            ErrorCode::UnknownInstruction,
         );
     }};
 }
