@@ -11,30 +11,23 @@ use jutsu_discriminator::Discriminator;
 use jutsu_utility::{fail_with_ctx_no_return, program_error};
 use jutsu_utility::{fail_with_ctx, Len};
 use jutsu_errors::{Result, ErrorCode};
-use jutsu_pda::CheckSeeds;
 
 pub trait ZcDeserialize
 where 
-    Self: Pod + Discriminator + CheckSeeds + Len + OwnerProgram,
+    Self: Pod + Discriminator + Len + OwnerProgram,
 {
     fn try_deserialize_zc<'a>(
         account_info: &'a AccountInfo,
-        pda_info: Option<Self::Info<'_>>,
     ) -> Result<Ref<'a, Self>> {
         let account_ref = try_deserialize_zc::<Self>(account_info)?;
-
-        account_ref.check_pda_seeds(account_info.key(), pda_info)?;
 
         Ok(account_ref)
     }
 
     fn try_deserialize_zc_mut<'a>(
         account_info: &'a AccountInfo,
-        pda_info: Option<Self::Info<'_>>,
     ) -> Result<RefMut<'a, Self>> {
         let account_ref = try_deserialize_zc_mut::<Self>(account_info)?;
-
-        account_ref.check_pda_seeds(account_info.key(), pda_info)?;
 
         Ok(account_ref)
     }

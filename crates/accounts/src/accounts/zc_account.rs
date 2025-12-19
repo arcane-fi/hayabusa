@@ -19,13 +19,13 @@ where
     T: ZcDeserialize,
 {   
     #[inline(always)]
-    pub fn try_deserialize_zc(&self, pda_info: Option<T::Info<'_>>) -> Result<Ref<'a, T>> {
-        T::try_deserialize_zc(self.account_info, pda_info)
+    pub fn try_deserialize_zc(&self) -> Result<Ref<'a, T>> {
+        T::try_deserialize_zc(self.account_info)
     }
 
     #[inline(always)]
-    pub fn try_deserialize_zc_mut(&self, pda_info: Option<T::Info<'_>>) -> Result<RefMut<'a, T>> {
-        T::try_deserialize_zc_mut(self.account_info, pda_info)
+    pub fn try_deserialize_zc_mut(&self) -> Result<RefMut<'a, T>> {
+        T::try_deserialize_zc_mut(self.account_info)
     }
 }
 
