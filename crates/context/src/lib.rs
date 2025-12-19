@@ -11,7 +11,7 @@ pub trait FromAccountInfos<'a>
 where 
     Self: Sized,
 {
-    fn try_from_account_infos(account_infos: &mut impl Iterator<Item = &'a AccountInfo>) -> Result<Self>;
+    fn try_from_account_infos(account_infos: &mut AccountIter<'a>) -> Result<Self>;
 }
 
 /// ## Context
@@ -23,7 +23,7 @@ where
     T: FromAccountInfos<'a>,
 {
     pub accounts: T,
-    pub remaining_accounts: core::slice::Iter<'a, AccountInfo>,
+    pub remaining_accounts: AccountIter<'a>,
 }
 
 impl<'a, T> Context<'a, T>
@@ -31,7 +31,7 @@ where
     T: FromAccountInfos<'a>,
 {
     pub fn construct(account_infos: &'a [AccountInfo]) -> Result<Self> {
-        let mut iter = account_infos.iter();
+        let mut iter = AccountIter::new(account_infos);
 
         let accounts = T::try_from_account_infos(&mut iter)?;
 
@@ -61,13 +61,10 @@ pub struct AccountIter<'a> {
 
 impl<'a> AccountIter<'a> {
     #[inline(always)]
-    pub fn new(
-        slice: &'a [AccountInfo],
-        index: usize,
-    ) -> Self {
+    pub fn new(slice: &'a [AccountInfo]) -> Self {
         Self {
             slice,
-            index,
+            index: 0,
         }
     }
 
