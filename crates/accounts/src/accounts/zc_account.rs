@@ -29,8 +29,8 @@ where
     }
 
     #[inline(always)]
-    pub fn try_initialize_zc(init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>> {
-        T::try_initialize_zc(init_accounts, signers)
+    pub fn try_initialize_zc(&self, init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>> {
+        T::try_initialize_zc(self.account_info, init_accounts, signers)
     }
 }
 

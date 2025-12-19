@@ -33,8 +33,8 @@ where
         Ok(account_ref)
     }
 
-    fn try_initialize_zc<'a>(init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, Self>> {
-        let account_ref = try_initialize_zc::<Self>(init_accounts, signers)?;
+    fn try_initialize_zc<'a>(target_account: &'a AccountInfo, init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, Self>> {
+        let account_ref = try_initialize_zc::<Self>(target_account, init_accounts, signers)?;
 
         Ok(account_ref)
     }
@@ -120,7 +120,6 @@ where
 
 pub struct InitAccounts<'a> {
     pub owner_program_id: &'a Pubkey,
-    pub target_account: &'a AccountInfo,
     pub payer_account: &'a AccountInfo,
     pub system_program: &'a AccountInfo,
 }
@@ -129,33 +128,31 @@ impl<'a> InitAccounts<'a> {
     #[inline(always)]
     pub fn new(
         owner_program_id: &'a Pubkey,
-        target_account: &'a AccountInfo,
         payer_account: &'a AccountInfo,
         system_program: &'a AccountInfo,
     ) -> Self {
         Self {
             owner_program_id,
-            target_account,
             payer_account,
             system_program,
         }
     }
 }
 
-pub fn try_initialize_zc<'a, T>(init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>>
+pub fn try_initialize_zc<'a, T>(target_account: &'a AccountInfo, init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>>
 where 
     T: Pod + Discriminator + Len + OwnerProgram,
 {
     // if the account already allocated, this will error, guarantees that the account is uninitialized
     create_account(
         init_accounts.owner_program_id,
-        init_accounts.target_account,
+        target_account,
         init_accounts.payer_account,
         signers,
         T::DISCRIMINATED_LEN as u64,
     )?;
 
-    let mut data = init_accounts.target_account.try_borrow_mut_data()?;
+    let mut data = target_account.try_borrow_mut_data()?;
 
     data[..8].copy_from_slice(T::DISCRIMINATOR);
 
