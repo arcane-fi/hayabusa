@@ -1,0 +1,23 @@
+[package]
+name = "jutsu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[features]
+std = ["pinocchio/std"]
+
+[dependencies]
+pinocchio.workspace = true
+pinocchio-pubkey.workspace = true
+jutsu-discriminator.workspace = true
+jutsu-discriminator-derive.workspace = true
+jutsu-errors.workspace = true
+jutsu-errors-derive.workspace = true
+jutsu-pda.workspace = true
+jutsu-accounts.workspace = true
+jutsu-context.workspace = true
+jutsu-utility.workspace = true
+jutsu-ser.workspace = true

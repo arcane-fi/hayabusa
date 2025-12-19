@@ -1,0 +1,26 @@
+[package]
+name = "counter-program"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+bytemuck = { version = "1.21.0", features = ["derive"] }
+jutsu = { path = "../../crates/lib" }
+
+[dev-dependencies]
+litesvm = "0.8.1"
+solana-instruction = "3.0"
+solana-keypair = "3.0"
+solana-native-token = "3.0"
+solana-pubkey = "3.0"
+solana-signer = "3.0"
+solana-system-interface = "2.0.0"
+solana-transaction = "3.0"
+
+[profile.release]
+lto = true
+codegen-units = 1

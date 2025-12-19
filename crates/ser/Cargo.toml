@@ -1,0 +1,20 @@
+[package]
+name = "jutsu-ser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[features]
+std = ["dep:borsh"]
+
+[dependencies]
+pinocchio.workspace = true
+borsh = { workspace = true, optional = true }
+bytemuck.workspace = true
+jutsu-discriminator.workspace = true
+jutsu-utility.workspace = true
+jutsu-pda.workspace = true
+jutsu-errors.workspace = true
+jutsu-accounts.workspace = true
