@@ -145,6 +145,7 @@ dependencies = [
  "jutsu-owner-program-derive",
  "jutsu-pda",
  "jutsu-ser",
+ "jutsu-ser-derive",
  "jutsu-utility",
  "pinocchio",
  "pinocchio-pubkey",
@@ -254,6 +255,16 @@ dependencies = [
  "jutsu-pda",
  "jutsu-utility",
  "pinocchio",
+]
+
+[[package]]
+name = "jutsu-ser-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sha2",
+ "syn",
 ]
 
 [[package]]

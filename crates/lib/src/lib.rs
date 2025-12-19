@@ -22,6 +22,7 @@ pub mod prelude {
     pub use jutsu_accounts::*;
     pub use jutsu_context::*;
     pub use jutsu_ser::*;
+    pub use jutsu_ser_derive::ZcDeserialize;
     pub use jutsu_utility::{*, take_bytes};
     pub use jutsu_errors::Result;
 
