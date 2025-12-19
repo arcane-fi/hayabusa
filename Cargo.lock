@@ -132,6 +132,7 @@ dependencies = [
 name = "jutsu"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "jutsu-accounts",
  "jutsu-context",
  "jutsu-discriminator",
@@ -161,6 +162,7 @@ version = "0.1.0"
 dependencies = [
  "jutsu-accounts",
  "jutsu-errors",
+ "jutsu-utility",
  "pinocchio",
 ]
 

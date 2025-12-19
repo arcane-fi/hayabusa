@@ -4,7 +4,8 @@
 #![no_std]
 
 use pinocchio::account_info::AccountInfo;
-use jutsu_errors::Result;
+use jutsu_errors::{Result, ErrorCode};
+use jutsu_utility::fail_with_ctx;
 
 pub trait FromAccountInfos<'a>
 where 
@@ -50,5 +51,38 @@ where
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
         &self.accounts
+    }
+}
+
+pub struct AccountIter<'a> {
+    slice: &'a [AccountInfo],
+    index: usize,
+}
+
+impl<'a> AccountIter<'a> {
+    #[inline(always)]
+    pub fn new(
+        slice: &'a [AccountInfo],
+        index: usize,
+    ) -> Self {
+        Self {
+            slice,
+            index,
+        }
+    }
+
+    #[inline(always)]
+    pub fn next(&mut self) -> Result<&'a AccountInfo> {
+        if self.index >= self.slice.len() {
+            fail_with_ctx!(
+                "JUTSU_ACCOUNT_ITER_NEXT_NOT_PRESENT",
+                ErrorCode::InvalidAccount,
+            );
+        }
+
+        let account_info = &self.slice[self.index];
+        self.index += 1;
+
+        Ok(account_info)
     }
 }

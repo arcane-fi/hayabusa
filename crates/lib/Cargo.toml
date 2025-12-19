@@ -10,6 +10,7 @@ rust-version.workspace = true
 std = ["pinocchio/std"]
 
 [dependencies]
+bytemuck.workspace = true
 pinocchio.workspace = true
 pinocchio-pubkey.workspace = true
 jutsu-discriminator.workspace = true
