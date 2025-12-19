@@ -19,6 +19,7 @@ pub mod prelude {
     pub use jutsu_context::*;
     pub use jutsu_ser::*;
     pub use jutsu_utility::*;
+    pub use jutsu_errors::Result;
 
     #[cfg(not(feature = "std"))]
     pub use pinocchio::nostd_panic_handler;
