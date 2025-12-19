@@ -34,3 +34,5 @@ jutsu-context = { path = "crates/context" }
 jutsu-ser = { path = "crates/ser" }
 jutsu-instruction-attribute-macro = { path = "crates/instruction-attribute-macro" }
 jutsu-instruction-dispatch-macro = { path = "crates/instruction-dispatch-macro" }
+jutsu-len-derive = { path = "crates/len-derive" }
+jutsu-owner-program-derive = { path = "crates/owner-program-derive" }

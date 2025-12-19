@@ -16,6 +16,8 @@ pub mod prelude {
     pub use jutsu_errors_derive::JutsuError;
     pub use jutsu_instruction_attribute_macro::instruction;
     pub use jutsu_instruction_dispatch_macro::dispatch;
+    pub use jutsu_len_derive::Len;
+    pub use jutsu_owner_program_derive::OwnerProgram;
     pub use jutsu_pda::*;
     pub use jutsu_accounts::*;
     pub use jutsu_context::*;

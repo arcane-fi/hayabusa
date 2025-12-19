@@ -24,3 +24,5 @@ jutsu-utility.workspace = true
 jutsu-ser.workspace = true
 jutsu-instruction-attribute-macro.workspace = true
 jutsu-instruction-dispatch-macro.workspace = true
+jutsu-len-derive.workspace = true
+jutsu-owner-program-derive.workspace = true

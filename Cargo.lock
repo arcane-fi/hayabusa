@@ -141,6 +141,8 @@ dependencies = [
  "jutsu-errors-derive",
  "jutsu-instruction-attribute-macro",
  "jutsu-instruction-dispatch-macro",
+ "jutsu-len-derive",
+ "jutsu-owner-program-derive",
  "jutsu-pda",
  "jutsu-ser",
  "jutsu-utility",
@@ -211,6 +213,26 @@ dependencies = [
 [[package]]
 name = "jutsu-instruction-dispatch-macro"
 version = "0.1.0"
+
+[[package]]
+name = "jutsu-len-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sha2",
+ "syn",
+]
+
+[[package]]
+name = "jutsu-owner-program-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sha2",
+ "syn",
+]
 
 [[package]]
 name = "jutsu-pda"
