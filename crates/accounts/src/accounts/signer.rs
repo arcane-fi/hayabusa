@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, ToAccountInfo, Key};
+use crate::{FromAccountInfo, ToAccountInfo, Key, WritableAllowed};
 use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
 use jutsu_errors::{ErrorCode, Result};
 use jutsu_utility::fail_with_ctx;
@@ -38,3 +38,5 @@ impl<'a> Key for Signer<'a> {
         self.account_info.key()
     }
 }
+
+impl<'a> WritableAllowed for Signer<'a> {}

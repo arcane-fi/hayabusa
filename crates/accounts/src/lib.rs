@@ -32,6 +32,8 @@ pub trait AccountInitializer<'a> {
     fn initialize_account(&self, account_data: &[u8]) -> Result<()>;
 }
 
+pub trait WritableAllowed {}
+
 pub trait ProgramId {
     const ID: Pubkey;
 }

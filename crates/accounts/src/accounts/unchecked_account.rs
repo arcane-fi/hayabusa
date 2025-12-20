@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, ToAccountInfo, Key};
+use crate::{FromAccountInfo, ToAccountInfo, Key, WritableAllowed};
 use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
 use jutsu_errors::Result;
 
@@ -37,3 +37,5 @@ impl<'a> core::ops::Deref for UncheckedAccount<'a> {
         self.account_info
     }
 }
+
+impl<'a> WritableAllowed for UncheckedAccount<'a> {}

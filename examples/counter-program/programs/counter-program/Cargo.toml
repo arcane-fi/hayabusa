@@ -1,0 +1,16 @@
+[package]
+name = "counter-program"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+bytemuck.workspace = true
+jutsu.workspace = true
+
+[profile.release]
+lto = true
+codegen-units = 1

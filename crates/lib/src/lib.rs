@@ -39,6 +39,7 @@ pub mod prelude {
         no_allocator,
         msg,
         seeds,
+        hint::unlikely,
         program_error::ProgramError,
         sysvars::{clock::Clock, fees::Fees, rent::Rent, Sysvar},
     };

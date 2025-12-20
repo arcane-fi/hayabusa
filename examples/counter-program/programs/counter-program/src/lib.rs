@@ -1,0 +1,100 @@
+#![no_std]
+#![allow(dead_code, unexpected_cfgs)]
+
+use bytemuck::{Pod, Zeroable};
+use jutsu::prelude::*;
+
+declare_id!("HPoDm7Kf63B6TpFKV7S8YSd7sGde6sVdztiDBEVkfuxz");
+
+#[cfg(not(feature = "no-entrypoint"))]
+mod entrypoint {
+    use super::*;
+
+    program_entrypoint!(program_entrypoint);
+    no_allocator!();
+    nostd_panic_handler!();
+
+    pub fn program_entrypoint(
+        program_id: &Pubkey,
+        accounts: &[AccountInfo],
+        instruction_data: &[u8],
+    ) -> ProgramResult {
+        dispatch!(
+            program_id,
+            instruction_data,
+            accounts,
+            UpdateCounterInstruction => update_counter(amount),
+            InitializeCounterInstruction => initialize_counter(),
+        );
+    }
+}
+
+#[instruction] // generates UpdateCounterInstruction { amount: u64 } + Discriminator
+fn update_counter<'a>(ctx: Context<'a, UpdateCounter<'a>>, amount: u64) -> Result<()> {
+    let mut counter = ctx.counter.try_deserialize_zc_mut()?;
+
+    counter.counter += amount;
+
+    Ok(())
+}
+
+pub struct UpdateCounter<'a> {
+    pub user: Signer<'a>,
+    pub counter: Mut<'a, ZcAccount<'a, CounterAccount>>,
+}
+
+// Intentionally kept manual, you get to see the construction proc macro is doing
+impl<'a> FromAccountInfos<'a> for UpdateCounter<'a> {
+    #[inline(always)]
+    fn try_from_account_infos(account_infos: &mut AccountIter<'a>) -> Result<Self> {
+        let user = Signer::try_from_account_info(account_infos.next()?)?;
+        let counter = Mut::try_from_account_info(account_infos.next()?)?;
+
+        Ok(UpdateCounter {
+            user,
+            counter,
+        })
+    }
+}
+
+#[instruction]
+fn initialize_counter<'a>(ctx: Context<'a, InitializeCounter<'a>>) -> Result<()> {
+    // account is zeroed on init
+    let _ = ctx.counter.try_initialize_zc(
+        InitAccounts::new(
+            &crate::ID,
+            ctx.user.to_account_info(),
+            ctx.system_program.to_account_info(),
+        ),
+        None,
+    )?;
+
+    Ok(())
+}
+
+pub struct InitializeCounter<'a> {
+    pub user: Mut<'a, Signer<'a>>,
+    pub counter: Mut<'a, ZcAccount<'a, CounterAccount>>,
+    pub system_program: Program<'a, System>,
+}
+
+impl<'a> FromAccountInfos<'a> for InitializeCounter<'a> {
+    #[inline(always)]
+    fn try_from_account_infos(account_infos: &mut AccountIter<'a>) -> Result<Self> {
+        let user = Mut::try_from_account_info(account_infos.next()?)?;
+        let counter = Mut::try_from_account_info(account_infos.next()?)?;
+        let system_program = Program::try_from_account_info(account_infos.next()?)?;
+
+        Ok(InitializeCounter {
+            user,
+            counter,
+            system_program,
+        })
+    }
+}
+
+#[derive(Pod, Zeroable, Discriminator, Len, ZcDeserialize, OwnerProgram, Copy, Clone)]
+#[repr(C)]
+pub struct CounterAccount {
+    pub counter: u64,
+}

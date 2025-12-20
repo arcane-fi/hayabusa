@@ -1,0 +1,10 @@
+[package]
+name = "program_tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jutsu.workspace = true
+bytemuck.workspace = true
+solana-sdk = "2.2.1"
+litesvm = "0.6.1"

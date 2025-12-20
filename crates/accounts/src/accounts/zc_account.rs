@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, ToAccountInfo, Key};
+use crate::{FromAccountInfo, ToAccountInfo, Key, WritableAllowed};
 use pinocchio::{account_info::{AccountInfo, Ref, RefMut}, instruction::Signer, pubkey::Pubkey};
 use jutsu_errors::Result;
 use jutsu_ser::{InitAccounts, ZcDeserialize};
@@ -66,3 +66,8 @@ where
         self.account_info.key()
     }
 }
+
+impl<'a, T> WritableAllowed for ZcAccount<'a, T>
+where 
+    T: ZcDeserialize,
+{}
