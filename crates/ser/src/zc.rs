@@ -178,6 +178,10 @@ where
     }))
 }
 
+pub trait FromBytesUnchecked {
+    unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a Self;
+}
+
 #[cfg(feature = "std")]
 pub fn try_deserialize_borsh<T>(account_info: &AccountInfo) -> Result<T>
 where

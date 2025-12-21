@@ -28,3 +28,4 @@ hayabusa-len-derive.workspace = true
 hayabusa-owner-program-derive.workspace = true
 hayabusa-ser-derive.workspace = true
 hayabusa-from-account-infos-derive.workspace = true
+hayabusa-account-attribute-macro.workspace = true

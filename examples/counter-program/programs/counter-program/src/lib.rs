@@ -18,7 +18,7 @@ mod entrypoint {
         program_id: &Pubkey,
         accounts: &[AccountInfo],
         instruction_data: &[u8],
-    ) -> ProgramResult {
+    ) -> Result<()> {
         dispatch!(
             program_id,
             instruction_data,
@@ -33,7 +33,7 @@ mod entrypoint {
 fn update_counter<'a>(ctx: Ctx<'a, UpdateCounter<'a>>, amount: u64) -> Result<()> {
     let mut counter = ctx.counter.try_deserialize_zc_mut()?;
 
-    counter.counter += amount;
+    counter.count += amount;
 
     Ok(())
 }
@@ -43,7 +43,7 @@ pub struct UpdateCounter<'a> {
     pub counter: Mut<'a, ZcAccount<'a, CounterAccount>>,
 }
 
-// Intentionally kept manual, you get to see the FromAccountInfos proc macro is doing
+// Intentionally kept manual, you get to see what the FromAccountInfos proc macro is doing
 impl<'a> FromAccountInfos<'a> for UpdateCounter<'a> {
     #[inline(always)]
     fn try_from_account_infos(account_infos: &mut AccountIter<'a>) -> Result<Self> {
@@ -79,8 +79,8 @@ pub struct InitializeCounter<'a> {
     pub system_program: Program<'a, System>,
 }
 
-#[derive(Pod, Zeroable, Discriminator, Len, ZcDeserialize, OwnerProgram, Copy, Clone)]
-#[repr(C)]
+#[account]
+#[derive(OwnerProgram)]
 pub struct CounterAccount {
-    pub counter: u64,
+    pub count: u64,
 }

@@ -5,6 +5,10 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.1.0"
+name = "counter-program"
+
 [workspace.dependencies]
 hayabusa = { path = "../../crates/lib" }
 bytemuck = { version = "1.21.0", features = ["derive"] }

@@ -22,6 +22,7 @@ proc-macro2 = "1.0"
 syn = "2.0"
 hayabusa = { path = "crates/lib" }
 hayabusa-accounts = { path = "crates/accounts" }
+hayabusa-account-attribute-macro = { path = "crates/account-attribute-macro" }
 hayabusa-discriminator = { path = "crates/discriminator" }
 hayabusa-discriminator-derive = { path = "crates/discriminator-derive" }
 hayabusa-errors = { path = "crates/errors" }

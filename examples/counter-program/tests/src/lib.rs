@@ -99,7 +99,7 @@ fn integration2() {
 
 }
 
-fn pack_zc_account<T: bytemuck::Pod + Discriminator>(account: T) -> Vec<u8> {
+fn pack_zc_account<T: bytemuck::NoUninit + Discriminator>(account: T) -> Vec<u8> {
     let mut data = T::DISCRIMINATOR.to_vec();
     data.extend_from_slice(bytemuck::bytes_of(&account));
     data

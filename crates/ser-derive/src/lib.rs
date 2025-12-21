@@ -16,3 +16,19 @@ pub fn derive_zc_deserialize(input: TokenStream) -> TokenStream {
 
     TokenStream::from(expanded)
 }
+
+#[proc_macro_derive(FromBytesUnchecked)]
+pub fn derive_from_bytes_unchecked(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let name = input.ident;
+
+    let expanded = quote! {
+        impl FromBytesUnchecked for #name {
+            unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a #name {
+                &*(bytes.as_ptr() as *const #name)
+            }
+        }
+    };
+
+    TokenStream::from(expanded)
+}

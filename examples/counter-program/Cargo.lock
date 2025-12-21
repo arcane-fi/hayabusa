@@ -1138,6 +1138,7 @@ name = "hayabusa"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "hayabusa-account-attribute-macro",
  "hayabusa-accounts",
  "hayabusa-context",
  "hayabusa-cpi",
@@ -1155,6 +1156,15 @@ dependencies = [
  "hayabusa-utility",
  "pinocchio",
  "pinocchio-pubkey",
+]
+
+[[package]]
+name = "hayabusa-account-attribute-macro"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
 ]
 
 [[package]]

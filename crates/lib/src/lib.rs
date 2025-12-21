@@ -10,6 +10,7 @@ pub mod instruction {
 pub mod prelude {
     pub use super::instruction;
 
+    pub use hayabusa_account_attribute_macro::account;
     pub use hayabusa_accounts::*;
     pub use hayabusa_context::*;
     pub use hayabusa_cpi::*;
@@ -23,7 +24,7 @@ pub mod prelude {
     pub use hayabusa_owner_program_derive::OwnerProgram;
     pub use hayabusa_pda::*;
     pub use hayabusa_ser::*;
-    pub use hayabusa_ser_derive::ZcDeserialize;
+    pub use hayabusa_ser_derive::*;
     pub use hayabusa_utility::{take_bytes, *};
 
     #[cfg(not(feature = "std"))]
