@@ -20,7 +20,6 @@ sha2 = "0.10"
 quote = "1.0"
 proc-macro2 = "1.0"
 syn = "2.0"
-hayabusa = { path = "crates/lib" }
 hayabusa-accounts = { path = "crates/accounts" }
 hayabusa-account-attribute-macro = { path = "crates/account-attribute-macro" }
 hayabusa-discriminator = { path = "crates/discriminator" }
@@ -38,3 +37,5 @@ hayabusa-ser-derive = { path = "crates/ser-derive" }
 hayabusa-cpi = { path = "crates/cpi" }
 hayabusa-from-account-infos-derive = { path = "crates/from-account-infos-derive" }
 hayabusa-system-program = { path = "crates/system-program" }
+hayabusa-token = { path = "crates/hayabusa-token" }
+hayabusa-token2022 = { path = "crates/hayabusa-token2022" }

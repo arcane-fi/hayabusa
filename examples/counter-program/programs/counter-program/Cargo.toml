@@ -7,9 +7,13 @@ publish = false
 [lib]
 crate-type = ["cdylib", "lib"]
 
+[features]
+no-entrypoint = []
+
 [dependencies]
 bytemuck.workspace = true
 hayabusa.workspace = true
+hayabusa-token.workspace = true
 
 [profile.release]
 lto = true

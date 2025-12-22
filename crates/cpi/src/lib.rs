@@ -12,10 +12,11 @@ use pinocchio::{
 pub trait CheckProgramId {
     const ID: Pubkey;
 
+    #[inline(always)]
     fn check_program_id(id: &Pubkey) -> Result<()> {
         if unlikely(id != &Self::ID) {
             fail_with_ctx!(
-                "HAYABUSA_CPI_PROGRAM_ID_INCORRECT_PROGRAM_ID",
+                "HAYABUSA_CPI_INCORRECT_PROGRAM_ID",
                 ProgramError::IncorrectProgramId,
                 id,
                 &Self::ID,
@@ -81,6 +82,7 @@ impl<'a, 'b, 'c, 'd, T: CheckProgramId> CpiCtx<'a, 'b, 'c, 'd, T> {
 impl<T: CheckProgramId> core::ops::Deref for CpiCtx<'_, '_, '_, '_, T> {
     type Target = T;
 
+    #[inline(always)]
     fn deref(&self) -> &Self::Target {
         &self.accounts
     }

@@ -1,6 +1,8 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::{write_bytes, UNINIT_BYTE};
+use core::slice::from_raw_parts;
 use hayabusa_cpi::{CpiCtx, CheckProgramId};
 use hayabusa_errors::Result;
 use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, instruction::{AccountMeta, Instruction}, pubkey::Pubkey};
@@ -10,34 +12,45 @@ pub struct Transfer<'a> {
     pub from: &'a AccountInfo,
     /// Recipient account
     pub to: &'a AccountInfo,
+    /// Authority account
+    pub authority: &'a AccountInfo,
 }
 
 impl CheckProgramId for Transfer<'_> {
     const ID: Pubkey = crate::ID;
 }
 
-#[inline]
+const DISCRIMINATOR: [u8; 1] = [3];
+
+#[inline(always)]
 pub fn transfer<'a>(
     cpi_ctx: CpiCtx<'a, '_, '_, '_, Transfer<'a>>,
-    lamports: u64,
+    amount: u64,
 ) -> Result<()> {
-    let infos = [cpi_ctx.from, cpi_ctx.to];
-    let metas = [
-        AccountMeta::writable_signer(cpi_ctx.from.key()),
-        AccountMeta::writable(cpi_ctx.to.key()),
+    let infos = [
+        cpi_ctx.from,
+        cpi_ctx.to,
+        cpi_ctx.authority,
     ];
 
-    // ix data
-    // - [0..4]: discriminator
-    // - [4..12]: lamports amount
-    let mut ix_data = [0; 12];
-    ix_data[0] = 2;
-    ix_data[4..12].copy_from_slice(&lamports.to_le_bytes());
+    let metas = [
+        AccountMeta::writable(cpi_ctx.from.key()),
+        AccountMeta::writable(cpi_ctx.to.key()),
+        AccountMeta::readonly_signer(cpi_ctx.authority.key()),
+    ];
+
+    // ix data layout
+    // - [0]: discriminator
+    // - [1..9]: amount
+    let mut ix_data = [UNINIT_BYTE; 9];
+
+    write_bytes(&mut ix_data, &DISCRIMINATOR);
+    write_bytes(&mut ix_data[1..9], &amount.to_le_bytes());
 
     let instruction = Instruction {
         program_id: &crate::ID,
         accounts: &metas,
-        data: &ix_data,
+        data: unsafe { from_raw_parts(ix_data.as_ptr() as _, 9) },
     };
 
     if let Some(signers) = cpi_ctx.signers {

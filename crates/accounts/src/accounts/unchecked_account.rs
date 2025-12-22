@@ -38,4 +38,4 @@ impl<'a> core::ops::Deref for UncheckedAccount<'a> {
     }
 }
 
-impl<'a> WritableAllowed for UncheckedAccount<'a> {}
+impl WritableAllowed for UncheckedAccount<'_> {}

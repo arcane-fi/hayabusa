@@ -2,15 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::{format_ident, quote};
-use syn::{parse_macro_input, FnArg, Ident, ItemFn, Pat, PatIdent, PatType, ReturnType, Type};
+use syn::{
+    parse_macro_input, FnArg, Ident, ItemFn, Pat, PatIdent, PatType, ReturnType, Type, LitStr,
+};
 
 #[proc_macro_attribute]
 pub fn instruction(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_fn = parse_macro_input!(item as ItemFn);
 
     let fn_name = &input_fn.sig.ident;
-    let struct_name = to_pascal_case(fn_name);
+    let ix_name = to_pascal_case(fn_name);
+    let struct_name = with_instruction_ident(ix_name.clone());
     let struct_ident = format_ident!("{struct_name}");
 
     let mut fields = Vec::new();
@@ -67,8 +71,15 @@ pub fn instruction(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let field_defs = fields.iter().map(|(ident, ty)| quote! { pub #ident: #ty, });
 
+    let mut instrumented_fn = input_fn.clone();
+    let msg = LitStr::new(&format!("Instruction: {}", ix_name), Span::call_site());
+    instrumented_fn
+        .block
+        .stmts
+        .insert(0, syn::parse_quote! { log!(#msg); });
+
     let expanded = quote! {
-        #input_fn
+        #instrumented_fn
 
         #[derive(Pod, Zeroable, Discriminator, Clone, Copy)]
         #[repr(C)]
@@ -92,10 +103,15 @@ fn to_pascal_case(ident: &Ident) -> String {
         }
     }
 
-    if !out.ends_with("Instruction") {
-        out.push_str("Instruction");
-    }
     out
+}
+
+fn with_instruction_ident(mut str: String) -> String {
+    if !str.ends_with("Instruction") {
+        str.push_str("Instruction");
+    }
+
+    str
 }
 
 fn returns_result_unit(ret: &ReturnType) -> bool {

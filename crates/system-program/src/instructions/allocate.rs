@@ -10,7 +10,7 @@ pub struct Allocate<'a> {
     pub account: &'a AccountInfo,
 }
 
-impl<'a> CheckProgramId for Allocate<'a> {
+impl CheckProgramId for Allocate<'_> {
     const ID: Pubkey = crate::ID;
 }
 

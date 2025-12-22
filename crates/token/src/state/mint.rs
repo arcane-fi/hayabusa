@@ -1,13 +1,12 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
+use hayabusa_errors::Result;
+use hayabusa_ser::{FromBytesUnchecked, RawZcDeserialize, Zc, Deserialize};
+use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
-    account_info::{AccountInfo, Ref},
-    program_error::ProgramError,
-    pubkey::Pubkey,
+    account_info::{AccountInfo, Ref}, hint::unlikely, program_error::ProgramError, pubkey::Pubkey
 };
-
-use crate::ID;
 
 /// Mint data.
 #[repr(C)]
@@ -37,63 +36,43 @@ pub struct Mint {
     freeze_authority: Pubkey,
 }
 
+impl Zc for Mint {}
+impl Deserialize for Mint {}
+
+/// SAFETY:
+/// Account data length is validated, and the Mint struct is properly aligned
+/// so it is safe to cast from raw ptr.
+unsafe impl RawZcDeserialize for Mint {
+    fn try_deserialize_raw<'a>(account_info: &'a AccountInfo) -> Result<Ref<'a, Self>> {
+        if unlikely(account_info.data_len() != Self::LEN) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_MINT_DATA_TOO_SHORT",
+                ProgramError::InvalidAccountData,
+                account_info.key(),
+                &u32::to_le_bytes(account_info.data_len() as u32),
+            );
+        }
+
+        if unlikely(!account_info.is_owned_by(&crate::ID)) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_MINT_INVALID_ACCOUNT_OWNER",
+                ProgramError::InvalidAccountOwner,
+                account_info.key(),
+                account_info.owner(),
+            );
+        }
+
+        Ok(Ref::map(account_info.try_borrow_data()?, |d| unsafe {
+            Self::from_bytes_unchecked(d)
+        }))
+    }
+}
+
+impl FromBytesUnchecked for Mint {}
+
 impl Mint {
     /// The length of the `Mint` account data.
     pub const LEN: usize = core::mem::size_of::<Mint>();
-
-    /// Return a `Mint` from the given account info.
-    ///
-    /// This method performs owner and length validation on `AccountInfo`, safe borrowing
-    /// the account data.
-    #[inline]
-    pub fn from_account_info(account_info: &AccountInfo) -> Result<Ref<Mint>, ProgramError> {
-        if account_info.data_len() != Self::LEN {
-            return Err(ProgramError::InvalidAccountData);
-        }
-        if !account_info.is_owned_by(&ID) {
-            return Err(ProgramError::InvalidAccountOwner);
-        }
-        Ok(Ref::map(account_info.try_borrow_data()?, |data| unsafe {
-            Self::from_bytes_unchecked(data)
-        }))
-    }
-
-    /// Return a `Mint` from the given account info.
-    ///
-    /// This method performs owner and length validation on `AccountInfo`, but does not
-    /// perform the borrow check.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that it is safe to borrow the account data (e.g., there are
-    /// no mutable borrows of the account data).
-    #[inline]
-    pub unsafe fn from_account_info_unchecked(
-        account_info: &AccountInfo,
-    ) -> Result<&Self, ProgramError> {
-        if account_info.data_len() != Self::LEN {
-            return Err(ProgramError::InvalidAccountData);
-        }
-        if account_info.owner() != &ID {
-            return Err(ProgramError::InvalidAccountOwner);
-        }
-        Ok(Self::from_bytes_unchecked(
-            account_info.borrow_data_unchecked(),
-        ))
-    }
-
-    /// Return a `Mint` from the given bytes.
-    ///
-    /// # Safety
-    ///
-    /// The caller must ensure that `bytes` contains a valid representation of `Mint`, and
-    /// it is properly aligned to be interpreted as an instance of `Mint`.
-    /// At the moment `Mint` has an alignment of 1 byte.
-    /// This method does not perform a length validation.
-    #[inline(always)]
-    pub unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &Self {
-        &*(bytes.as_ptr() as *const Mint)
-    }
 
     #[inline(always)]
     pub fn has_mint_authority(&self) -> bool {

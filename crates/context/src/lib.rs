@@ -30,6 +30,7 @@ impl<'a, T> Ctx<'a, T>
 where
     T: FromAccountInfos<'a>,
 {
+    #[inline(always)]
     pub fn construct(account_infos: &'a [AccountInfo]) -> Result<Self> {
         let mut iter = AccountIter::new(account_infos);
 
@@ -54,6 +55,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct AccountIter<'a> {
     slice: &'a [AccountInfo],
     index: usize,

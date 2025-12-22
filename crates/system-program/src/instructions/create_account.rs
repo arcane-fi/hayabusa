@@ -13,7 +13,7 @@ pub struct CreateAccount<'a> {
     pub to: &'a AccountInfo,
 }
 
-impl<'a> CheckProgramId for CreateAccount<'a> {
+impl CheckProgramId for CreateAccount<'_> {
     const ID: Pubkey = crate::ID;
 }
 

@@ -13,3 +13,5 @@ pinocchio-pubkey.workspace = true
 hayabusa-cpi.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true
+hayabusa-ser.workspace = true
+hayabusa-accounts.workspace = true

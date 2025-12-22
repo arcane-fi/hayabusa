@@ -31,7 +31,7 @@ mod entrypoint {
 
 #[instruction] // generates UpdateCounterInstruction { amount: u64 } + Discriminator
 fn update_counter<'a>(ctx: Ctx<'a, UpdateCounter<'a>>, amount: u64) -> Result<()> {
-    let mut counter = ctx.counter.try_deserialize_zc_mut()?;
+    let mut counter = ctx.counter.try_deserialize_mut()?;
 
     counter.count += amount;
 
@@ -60,7 +60,7 @@ impl<'a> FromAccountInfos<'a> for UpdateCounter<'a> {
 #[instruction]
 fn initialize_counter<'a>(ctx: Ctx<'a, InitializeCounter<'a>>) -> Result<()> {
     // account is zeroed on init
-    let _ = ctx.counter.try_initialize_zc(
+    let _ = ctx.counter.try_initialize(
         InitAccounts::new(
             &crate::ID,
             ctx.user.to_account_info(),

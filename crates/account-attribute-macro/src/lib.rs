@@ -16,7 +16,7 @@ fn strip_account_attr(attrs: &[Attribute]) -> Vec<Attribute> {
 /// Expands to:
 /// ```
 /// #[derive(::bytemuck::Pod, ::bytemuck::Zeroable)]
-/// #[derive(Discriminator, Len, ZcDeserialize, Copy, Clone)]
+/// #[derive(Discriminator, Len, ZcDeserialize, ZcDeserializeMut, ZcInitialize, Copy, Clone)]
 /// #[repr(C)]
 /// ```
 #[proc_macro_attribute]
@@ -61,7 +61,20 @@ fn expand_account(input: ItemStruct) -> Result<proc_macro2::TokenStream> {
 
     Ok(quote! {
         #(#preserved_struct_attrs)*
-        #[derive(::bytemuck::Pod, ::bytemuck::Zeroable, Discriminator, Len, ZcDeserialize, Copy, Clone)]
+        #[derive(
+            ::bytemuck::Pod,
+            ::bytemuck::Zeroable,
+            Discriminator,
+            Len,
+            Deserialize,
+            DeserializeMut,
+            Zc,
+            ZcDeserialize,
+            ZcDeserializeMut,
+            ZcInitialize,
+            Copy,
+            Clone,
+        )]
         #[repr(C)]
         #vis struct #ident #impl_generics #fields #where_clause
     })

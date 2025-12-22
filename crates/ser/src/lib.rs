@@ -6,3 +6,9 @@
 pub mod zc;
 
 pub use zc::*;
+
+// marker traits
+
+pub trait Zc {}
+pub trait Deserialize {}
+pub trait DeserializeMut {}

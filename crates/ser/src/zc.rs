@@ -1,6 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
+use super::{Deserialize, DeserializeMut, Zc};
 #[cfg(feature = "std")]
 use borsh::BorshDeserialize;
 use bytemuck::{AnyBitPattern, Pod};
@@ -19,33 +20,60 @@ use pinocchio::{
     pubkey::Pubkey,
 };
 
+pub unsafe trait RawZcDeserialize: Sized + FromBytesUnchecked + Zc + Deserialize {
+    fn try_deserialize_raw<'a>(account_info: &'a AccountInfo) -> Result<Ref<'a, Self>>;
+}
+
+pub unsafe trait RawZcDeserializeMut 
+where
+    Self: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut,
+{
+    fn try_deserialize_raw_mut<'a>(account_info: &'a AccountInfo) -> Result<RefMut<'a, Self>>;
+}
+
+/// Unsafe to call either trait method
+/// You must ensure proper alignment of Self, prefer 0x1
+pub trait FromBytesUnchecked: Sized {
+    unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &Self {
+        &*(bytes.as_ptr() as *const Self)
+    }
+    unsafe fn from_bytes_unchecked_mut(bytes: &mut [u8]) -> &mut Self {
+        &mut *(bytes.as_mut_ptr() as *mut Self)
+    }
+}
+
 pub trait ZcDeserialize
 where
+    Self: AnyBitPattern + Discriminator + Len + OwnerProgram + Zc + Deserialize,
+{
+    fn try_deserialize<'a>(account_info: &'a AccountInfo) -> Result<Ref<'a, Self>> {
+        try_deserialize_zc::<Self>(account_info)
+    }
+}
+
+pub trait ZcDeserializeMut
+where 
+    Self: Pod + Discriminator + Len + OwnerProgram + Zc + Deserialize + DeserializeMut,
+{
+    fn try_deserialize_mut<'a>(account_info: &'a AccountInfo) -> Result<RefMut<'a, Self>> {
+        try_deserialize_zc_mut::<Self>(account_info)
+    }
+}
+
+pub trait ZcInitialize
+where 
     Self: Pod + Discriminator + Len + OwnerProgram,
 {
-    fn try_deserialize_zc<'a>(account_info: &'a AccountInfo) -> Result<Ref<'a, Self>> {
-        let account_ref = try_deserialize_zc::<Self>(account_info)?;
-
-        Ok(account_ref)
-    }
-
-    fn try_deserialize_zc_mut<'a>(account_info: &'a AccountInfo) -> Result<RefMut<'a, Self>> {
-        let account_ref = try_deserialize_zc_mut::<Self>(account_info)?;
-
-        Ok(account_ref)
-    }
-
     fn try_initialize_zc<'a>(
         target_account: &'a AccountInfo,
         init_accounts: InitAccounts<'a>,
         signers: Option<&[Signer]>,
     ) -> Result<RefMut<'a, Self>> {
-        let account_ref = try_initialize_zc::<Self>(target_account, init_accounts, signers)?;
-
-        Ok(account_ref)
+        try_initialize_zc::<Self>(target_account, init_accounts, signers)
     }
 }
 
+#[inline(always)]
 pub fn try_deserialize_zc<'a, T>(account_info: &'a AccountInfo) -> Result<Ref<'a, T>>
 where
     T: AnyBitPattern + Discriminator + Len + OwnerProgram,
@@ -87,6 +115,7 @@ where
     }))
 }
 
+#[inline(always)]
 pub fn try_deserialize_zc_mut<'a, T>(account_info: &'a AccountInfo) -> Result<RefMut<'a, T>>
 where
     T: Pod + Discriminator + Len + OwnerProgram,
@@ -149,6 +178,7 @@ impl<'a> InitAccounts<'a> {
     }
 }
 
+#[inline(always)]
 pub fn try_initialize_zc<'a, T>(
     target_account: &'a AccountInfo,
     init_accounts: InitAccounts<'a>,
@@ -176,10 +206,6 @@ where
     Ok(RefMut::map(data, |d| {
         bytemuck::from_bytes_mut(&mut d[8..T::DISCRIMINATED_LEN])
     }))
-}
-
-pub trait FromBytesUnchecked {
-    unsafe fn from_bytes_unchecked<'a>(bytes: &'a [u8]) -> &'a Self;
 }
 
 #[cfg(feature = "std")]

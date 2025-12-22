@@ -5,6 +5,7 @@ use litesvm::LiteSVM;
 use solana_sdk::{
     account::Account, instruction::{AccountMeta, Instruction}, pubkey::Pubkey, signature::Keypair, signer::Signer, system_program, transaction::Transaction, pubkey,
 };
+use spl_token::{state::{Account as TokenAccount, Mint}, solana_program::program_pack::Pack};
 
 #[test]
 fn integration() {
