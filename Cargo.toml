@@ -10,6 +10,7 @@ license = "Apache-2.0"
 authors = ["Levi Bland <levi@arcane.fi>"]
 repository = "https://github.com/arcane-fi/hayabusa"
 rust-version = "1.82"
+description = "Hayabusa: lightweight Solana runtime library."
 
 [workspace.dependencies]
 borsh = { version = "1.5", features = ["derive"] }
@@ -20,22 +21,22 @@ sha2 = "0.10"
 quote = "1.0"
 proc-macro2 = "1.0"
 syn = "2.0"
-hayabusa-accounts = { path = "crates/accounts" }
-hayabusa-account-attribute-macro = { path = "crates/account-attribute-macro" }
-hayabusa-discriminator = { path = "crates/discriminator" }
-hayabusa-discriminator-derive = { path = "crates/discriminator-derive" }
-hayabusa-errors = { path = "crates/errors" }
-hayabusa-pda = { path = "crates/pda" }
-hayabusa-utility = { path = "crates/utility" }
-hayabusa-context = { path = "crates/context" }
-hayabusa-ser = { path = "crates/ser" }
-hayabusa-instruction-attribute-macro = { path = "crates/instruction-attribute-macro" }
-hayabusa-instruction-dispatch-macro = { path = "crates/instruction-dispatch-macro" }
-hayabusa-len-derive = { path = "crates/len-derive" }
-hayabusa-owner-program-derive = { path = "crates/owner-program-derive" }
-hayabusa-ser-derive = { path = "crates/ser-derive" }
-hayabusa-cpi = { path = "crates/cpi" }
-hayabusa-from-account-infos-derive = { path = "crates/from-account-infos-derive" }
-hayabusa-system-program = { path = "crates/system-program" }
-hayabusa-token = { path = "crates/hayabusa-token" }
-hayabusa-token2022 = { path = "crates/hayabusa-token2022" }
+hayabusa-accounts = { version = "0.1.0", path = "crates/accounts" }
+hayabusa-account-attribute-macro = { version = "0.1.0", path = "crates/account-attribute-macro" }
+hayabusa-discriminator = { version = "0.1.0", path = "crates/discriminator" }
+hayabusa-discriminator-derive = { version = "0.1.0", path = "crates/discriminator-derive" }
+hayabusa-errors = { version = "0.1.0", path = "crates/errors" }
+hayabusa-pda = { version = "0.1.0", path = "crates/pda" }
+hayabusa-utility = { version = "0.1.0", path = "crates/utility" }
+hayabusa-context = { version = "0.1.0", path = "crates/context" }
+hayabusa-ser = { version = "0.1.0", path = "crates/ser" }
+hayabusa-instruction-attribute-macro = { version = "0.1.0", path = "crates/instruction-attribute-macro" }
+hayabusa-instruction-dispatch-macro = { version = "0.1.0", path = "crates/instruction-dispatch-macro" }
+hayabusa-len-derive = { version = "0.1.0", path = "crates/len-derive" }
+hayabusa-owner-program-derive = { version = "0.1.0", path = "crates/owner-program-derive" }
+hayabusa-ser-derive = { version = "0.1.0", path = "crates/ser-derive" }
+hayabusa-cpi = { version = "0.1.0", path = "crates/cpi" }
+hayabusa-from-account-infos-derive = { version = "0.1.0", path = "crates/from-account-infos-derive" }
+hayabusa-system-program = { version = "0.1.0", path = "crates/system-program" }
+hayabusa-token = { version = "0.1.0", path = "crates/hayabusa-token" }
+hayabusa-token2022 = { version = "0.1.0", path = "crates/hayabusa-token2022" }

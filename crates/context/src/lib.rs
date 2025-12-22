@@ -67,6 +67,7 @@ impl<'a> AccountIter<'a> {
         Self { slice, index: 0 }
     }
 
+    #[allow(clippy::should_implement_trait)]
     #[inline(always)]
     pub fn next(&mut self) -> Result<&'a AccountInfo> {
         if self.index >= self.slice.len() {

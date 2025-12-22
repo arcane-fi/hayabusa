@@ -6,5 +6,7 @@ license.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+description = "Hayabusa Token2022 program interface"
+publish = false
 
 [dependencies]

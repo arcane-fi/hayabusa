@@ -17,7 +17,7 @@ where
 }
 
 #[inline(always)]
-pub fn take_bytes<'a>(data: &'a [u8], n: usize) -> Result<(&'a [u8], &'a [u8])> {
+pub fn take_bytes(data: &[u8], n: usize) -> Result<(&[u8], &[u8])> {
     if data.len() < n {
         fail_with_ctx!(
             "HAYABUSA_TAKE_BYTES_INSUFFICIENT_DATA",

@@ -20,10 +20,14 @@ use pinocchio::{
     pubkey::Pubkey,
 };
 
+/// # Safety
+/// You must ensure proper alignment of Self, prefer 0x1
 pub unsafe trait RawZcDeserialize: Sized + FromBytesUnchecked + Zc + Deserialize {
     fn try_deserialize_raw<'a>(account_info: &'a AccountInfo) -> Result<Ref<'a, Self>>;
 }
 
+/// # Safety
+/// You must ensure proper alignment of Self, prefer 0x1
 pub unsafe trait RawZcDeserializeMut 
 where
     Self: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut,
@@ -34,9 +38,13 @@ where
 /// Unsafe to call either trait method
 /// You must ensure proper alignment of Self, prefer 0x1
 pub trait FromBytesUnchecked: Sized {
+    /// # Safety
+    /// You must ensure proper alignment of Self, prefer 0x1
     unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &Self {
         &*(bytes.as_ptr() as *const Self)
     }
+    /// # Safety
+    /// You must ensure proper alignment of Self, prefer 0x1
     unsafe fn from_bytes_unchecked_mut(bytes: &mut [u8]) -> &mut Self {
         &mut *(bytes.as_mut_ptr() as *mut Self)
     }

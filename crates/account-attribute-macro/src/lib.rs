@@ -8,8 +8,8 @@ use syn::{parse_macro_input, Attribute, ItemStruct, Result};
 fn strip_account_attr(attrs: &[Attribute]) -> Vec<Attribute> {
     attrs
         .iter()
-        .cloned()
         .filter(|attr| !attr.path().is_ident("account"))
+        .cloned()
         .collect()
 }
 

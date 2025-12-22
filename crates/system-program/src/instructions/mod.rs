@@ -14,7 +14,7 @@ pub use transfer::*;
 use hayabusa_errors::Result;
 use pinocchio::sysvars::{rent::Rent, Sysvar};
 
-pub(self) fn minimum_balance(space: usize) -> Result<u64> {
+fn minimum_balance(space: usize) -> Result<u64> {
     let rent = Rent::get()?;
 
     Ok(rent.minimum_balance(space))
