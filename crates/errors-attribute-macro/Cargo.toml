@@ -1,5 +1,5 @@
 [package]
-name = "hayabusa-errors-derive"
+name = "hayabusa-errors-attribute-macro"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

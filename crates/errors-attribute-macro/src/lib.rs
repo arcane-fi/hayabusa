@@ -1,6 +1,3 @@
-// Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
-// SPDX-License-Identifier: Apache-2.0
-
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{parse_macro_input, ItemEnum};
@@ -44,7 +41,7 @@ pub fn error(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let enum_ident = &input_enum.ident;
 
-    // NOTE: We assume ProgramError is in scope at the call site..
+    // NOTE: We assume ProgramError is in scope at the call site.
     let expanded = quote! {
         #input_enum
 

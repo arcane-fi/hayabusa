@@ -232,6 +232,7 @@ dependencies = [
  "hayabusa-discriminator",
  "hayabusa-discriminator-derive",
  "hayabusa-errors",
+ "hayabusa-errors-attribute-macro",
  "hayabusa-from-account-infos-derive",
  "hayabusa-instruction-attribute-macro",
  "hayabusa-instruction-dispatch-macro",
@@ -315,7 +316,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hayabusa-errors-derive"
+name = "hayabusa-errors-attribute-macro"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

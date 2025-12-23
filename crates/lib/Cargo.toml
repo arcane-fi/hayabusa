@@ -19,6 +19,7 @@ hayabusa-cpi.workspace = true
 hayabusa-discriminator.workspace = true
 hayabusa-discriminator-derive.workspace = true
 hayabusa-errors.workspace = true
+hayabusa-errors-attribute-macro.workspace = true
 hayabusa-pda.workspace = true
 hayabusa-accounts.workspace = true
 hayabusa-context.workspace = true

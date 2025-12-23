@@ -26,7 +26,7 @@ hayabusa-account-attribute-macro = { version = "0.1.0", path = "crates/account-a
 hayabusa-discriminator = { version = "0.1.0", path = "crates/discriminator" }
 hayabusa-discriminator-derive = { version = "0.1.0", path = "crates/discriminator-derive" }
 hayabusa-errors = { version = "0.1.0", path = "crates/errors" }
-hayabus-errors-derive = { version = "0.1.0", path = "crates/errors-derive" }
+hayabusa-errors-attribute-macro = { version = "0.1.0", path = "crates/errors-attribute-macro" }
 hayabusa-pda = { version = "0.1.0", path = "crates/pda" }
 hayabusa-utility = { version = "0.1.0", path = "crates/utility" }
 hayabusa-context = { version = "0.1.0", path = "crates/context" }

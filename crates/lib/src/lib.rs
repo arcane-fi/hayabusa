@@ -17,6 +17,7 @@ pub mod prelude {
     pub use hayabusa_discriminator::Discriminator;
     pub use hayabusa_discriminator_derive::Discriminator;
     pub use hayabusa_errors::{ErrorCode, Result};
+    pub use hayabusa_errors_attribute_macro::error;
     pub use hayabusa_instruction_attribute_macro::instruction;
     pub use hayabusa_instruction_dispatch_macro::dispatch;
     pub use hayabusa_from_account_infos_derive::FromAccountInfos;
