@@ -7,8 +7,13 @@ pub mod instruction {
     pub use pinocchio::instruction::{AccountMeta, Instruction, Seed, Signer};
 }
 
+pub mod system_program {
+    pub use hayabusa_system_program::*;
+}
+
 pub mod prelude {
     pub use super::instruction;
+    pub use super::system_program;
 
     pub use hayabusa_account_attribute_macro::account;
     pub use hayabusa_accounts::*;

@@ -241,6 +241,7 @@ dependencies = [
  "hayabusa-pda",
  "hayabusa-ser",
  "hayabusa-ser-derive",
+ "hayabusa-system-program",
  "hayabusa-utility",
  "pinocchio",
  "pinocchio-pubkey",
