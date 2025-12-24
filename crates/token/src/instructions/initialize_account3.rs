@@ -3,9 +3,14 @@
 
 use crate::{write_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, instruction::{AccountMeta, Instruction}, pubkey::Pubkey};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct InitializeAccount3<'a> {
     /// New account

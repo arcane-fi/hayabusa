@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::AccountState;
-use hayabusa_ser::{FromBytesUnchecked, RawZcDeserialize, Deserialize, Zc};
+use hayabusa_ser::{Deserialize, FromBytesUnchecked, RawZcDeserialize, Zc};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
-    account_info::{AccountInfo, Ref}, hint::unlikely, program_error::ProgramError, pubkey::Pubkey
+    account_info::{AccountInfo, Ref},
+    hint::unlikely,
+    program_error::ProgramError,
+    pubkey::Pubkey,
 };
 
 /// Token account data.

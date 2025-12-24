@@ -3,7 +3,10 @@
 
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
 use hayabusa_errors::Result;
-use hayabusa_ser::{InitAccounts, ZcDeserialize, ZcDeserializeMut, ZcInitialize, RawZcDeserialize, RawZcDeserializeMut, Deserialize, Zc};
+use hayabusa_ser::{
+    Deserialize, InitAccounts, RawZcDeserialize, RawZcDeserializeMut, Zc, ZcDeserialize,
+    ZcDeserializeMut, ZcInitialize,
+};
 use pinocchio::{
     account_info::{AccountInfo, Ref, RefMut},
     instruction::Signer,
@@ -12,7 +15,7 @@ use pinocchio::{
 
 // ideally would put trait bound but ZcDeserialize and RawZcDeserialize are sometimes mutually exclusive
 pub struct ZcAccount<'a, T>
-where 
+where
     T: Zc + Deserialize,
 {
     pub account_info: &'a AccountInfo,
@@ -32,7 +35,7 @@ where
 
 #[allow(dead_code)]
 impl<'a, T> ZcAccount<'a, T>
-where 
+where
     T: ZcDeserialize + ZcDeserializeMut,
 {
     #[inline(always)]
@@ -42,11 +45,15 @@ where
 }
 
 impl<'a, T> ZcAccount<'a, T>
-where 
+where
     T: ZcDeserialize + ZcInitialize,
 {
     #[inline(always)]
-    pub fn try_initialize(&self, init_accounts: InitAccounts<'a>, signers: Option<&[Signer]>) -> Result<RefMut<'a, T>> {
+    pub fn try_initialize(
+        &self,
+        init_accounts: InitAccounts<'a>,
+        signers: Option<&[Signer]>,
+    ) -> Result<RefMut<'a, T>> {
         T::try_initialize_zc(self.account_info, init_accounts, signers)
     }
 }
@@ -62,7 +69,7 @@ where
 }
 
 impl<'a, T> ZcAccount<'a, T>
-where 
+where
     T: RawZcDeserialize + RawZcDeserializeMut,
 {
     #[inline(always)]
@@ -72,7 +79,7 @@ where
 }
 
 impl<'a, T> FromAccountInfo<'a> for ZcAccount<'a, T>
-where 
+where
     T: Zc + Deserialize,
 {
     #[inline(always)]
@@ -85,7 +92,7 @@ where
 }
 
 impl<'a, T> ToAccountInfo<'a> for ZcAccount<'a, T>
-where 
+where
     T: Zc + Deserialize,
 {
     #[inline(always)]
@@ -95,7 +102,7 @@ where
 }
 
 impl<'a, T> Key for ZcAccount<'a, T>
-where 
+where
     T: Zc + Deserialize,
 {
     #[inline(always)]

@@ -3,9 +3,7 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{
-    parse_macro_input, spanned::Spanned, Data, DeriveInput, Fields, Type, TypePath,
-};
+use syn::{parse_macro_input, spanned::Spanned, Data, DeriveInput, Fields, Type, TypePath};
 
 #[proc_macro_derive(FromAccountInfos)]
 pub fn derive_from_account_infos(input: TokenStream) -> TokenStream {

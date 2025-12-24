@@ -6,7 +6,8 @@
 use hayabusa_errors::Result;
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
-    account_info::AccountInfo, hint::unlikely, instruction::Signer, program_error::ProgramError, pubkey::Pubkey
+    account_info::AccountInfo, hint::unlikely, instruction::Signer, program_error::ProgramError,
+    pubkey::Pubkey,
 };
 
 pub trait CheckProgramId {
@@ -50,10 +51,7 @@ impl<'a, 'b, 'c, 'd, T: CheckProgramId> CpiCtx<'a, 'b, 'c, 'd, T> {
     }
 
     #[inline(always)]
-    pub fn try_new_without_signer(
-        program_info: &'a AccountInfo,
-        accounts: T,
-    ) -> Result<Self> {
+    pub fn try_new_without_signer(program_info: &'a AccountInfo, accounts: T) -> Result<Self> {
         T::check_program_id(program_info.key())?;
 
         Ok(Self {

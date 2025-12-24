@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::minimum_balance;
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, pubkey::Pubkey, instruction::{AccountMeta, Instruction}};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct CreateAccount<'a> {
     /// Funding account
@@ -36,7 +41,7 @@ pub fn create_account<'a>(
     // - [0..4]: instruction discriminator, in this case it is zero
     // - [4..12]: lamports
     // - [12..20]: account space
-    // - [20..52]: owner pubkey 
+    // - [20..52]: owner pubkey
     let mut ix_data = [0; 52];
     ix_data[4..12].copy_from_slice(&lamports.to_le_bytes());
     ix_data[12..20].copy_from_slice(&space.to_le_bytes());

@@ -1,9 +1,14 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, pubkey::Pubkey, instruction::{AccountMeta, Instruction}};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct Assign<'a> {
     /// Account to be assigned to a program
@@ -15,16 +20,13 @@ impl CheckProgramId for Assign<'_> {
 }
 
 #[inline(always)]
-pub fn assign<'a>(
-    cpi_ctx: CpiCtx<'a, '_, '_, '_, Assign<'a>>,
-    owner: &Pubkey,
-) -> Result<()> {
+pub fn assign<'a>(cpi_ctx: CpiCtx<'a, '_, '_, '_, Assign<'a>>, owner: &Pubkey) -> Result<()> {
     let infos = [cpi_ctx.account];
     let metas = [AccountMeta::writable_signer(cpi_ctx.account.key())];
 
     // ix data
     // - [0..4]: discriminator
-    // - [4..36]: owner pubkey 
+    // - [4..36]: owner pubkey
     let mut ix_data = [0; 36];
     ix_data[0] = 1;
     ix_data[4..36].copy_from_slice(owner.as_ref());

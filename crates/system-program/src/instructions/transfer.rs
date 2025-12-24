@@ -1,9 +1,14 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, instruction::{AccountMeta, Instruction}, pubkey::Pubkey};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct Transfer<'a> {
     /// Funding account
@@ -17,10 +22,7 @@ impl CheckProgramId for Transfer<'_> {
 }
 
 #[inline]
-pub fn transfer<'a>(
-    cpi_ctx: CpiCtx<'a, '_, '_, '_, Transfer<'a>>,
-    lamports: u64,
-) -> Result<()> {
+pub fn transfer<'a>(cpi_ctx: CpiCtx<'a, '_, '_, '_, Transfer<'a>>, lamports: u64) -> Result<()> {
     let infos = [cpi_ctx.from, cpi_ctx.to];
     let metas = [
         AccountMeta::writable_signer(cpi_ctx.from.key()),

@@ -8,7 +8,11 @@ use std::{
 };
 
 #[derive(Parser, Debug)]
-#[command(name = "hayabusa", version, about = "CLI for the Hayabusa Solana runtime framework")]
+#[command(
+    name = "hayabusa",
+    version,
+    about = "CLI for the Hayabusa Solana runtime framework"
+)]
 struct Cli {
     #[command(subcommand)]
     cmd: Commands,
@@ -53,12 +57,10 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.cmd {
-        Commands::New {
-            name,
-            path,
-            force,
-        } => cmd_new(&name, path.as_deref(), force),
-        Commands::Build { program, workspace } => cmd_build(program.as_deref(), workspace.as_deref()),
+        Commands::New { name, path, force } => cmd_new(&name, path.as_deref(), force),
+        Commands::Build { program, workspace } => {
+            cmd_build(program.as_deref(), workspace.as_deref())
+        }
         Commands::Test { workspace } => cmd_test(workspace.as_deref()),
     }
 }
@@ -131,7 +133,8 @@ fn cmd_build(program: Option<&str>, workspace: Option<&Path>) -> Result<()> {
     let program_name = match program {
         Some(p) => p.to_string(),
         None => infer_workspace_dir_name(ws)?,
-    }.replace("-", "_");
+    }
+    .replace("-", "_");
 
     // cargo build-sbf
     let status = Command::new("cargo")

@@ -1,10 +1,13 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use hayabusa_ser::{FromBytesUnchecked, RawZcDeserialize, Deserialize, Zc};
+use hayabusa_ser::{Deserialize, FromBytesUnchecked, RawZcDeserialize, Zc};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
-    account_info::{AccountInfo, Ref}, hint::unlikely, program_error::ProgramError, pubkey::Pubkey
+    account_info::{AccountInfo, Ref},
+    hint::unlikely,
+    program_error::ProgramError,
+    pubkey::Pubkey,
 };
 
 pub const MAX_MULTISIG_SIGNERS: usize = 11;
@@ -26,7 +29,9 @@ impl Zc for Multisig {}
 impl Deserialize for Multisig {}
 
 unsafe impl RawZcDeserialize for Multisig {
-    fn try_deserialize_raw<'a>(account_info: &'a AccountInfo) -> hayabusa_errors::Result<Ref<'a, Self>> {
+    fn try_deserialize_raw<'a>(
+        account_info: &'a AccountInfo,
+    ) -> hayabusa_errors::Result<Ref<'a, Self>> {
         if unlikely(account_info.data_len() != Self::LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_MULTISIG_ACCOUNT_DATA_TOO_SHORT",

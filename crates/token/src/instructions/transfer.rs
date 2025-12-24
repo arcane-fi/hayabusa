@@ -3,9 +3,14 @@
 
 use crate::{write_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, instruction::{AccountMeta, Instruction}, pubkey::Pubkey};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct Transfer<'a> {
     /// Funding account
@@ -23,15 +28,8 @@ impl CheckProgramId for Transfer<'_> {
 const DISCRIMINATOR: [u8; 1] = [3];
 
 #[inline(always)]
-pub fn transfer<'a>(
-    cpi_ctx: CpiCtx<'a, '_, '_, '_, Transfer<'a>>,
-    amount: u64,
-) -> Result<()> {
-    let infos = [
-        cpi_ctx.from,
-        cpi_ctx.to,
-        cpi_ctx.authority,
-    ];
+pub fn transfer<'a>(cpi_ctx: CpiCtx<'a, '_, '_, '_, Transfer<'a>>, amount: u64) -> Result<()> {
+    let infos = [cpi_ctx.from, cpi_ctx.to, cpi_ctx.authority];
 
     let metas = [
         AccountMeta::writable(cpi_ctx.from.key()),

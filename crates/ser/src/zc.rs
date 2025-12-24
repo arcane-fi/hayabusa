@@ -28,7 +28,7 @@ pub unsafe trait RawZcDeserialize: Sized + FromBytesUnchecked + Zc + Deserialize
 
 /// # Safety
 /// You must ensure proper alignment of Self, prefer 0x1
-pub unsafe trait RawZcDeserializeMut 
+pub unsafe trait RawZcDeserializeMut
 where
     Self: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut,
 {
@@ -60,7 +60,7 @@ where
 }
 
 pub trait ZcDeserializeMut
-where 
+where
     Self: Pod + Discriminator + Len + OwnerProgram + Zc + Deserialize + DeserializeMut,
 {
     fn try_deserialize_mut<'a>(account_info: &'a AccountInfo) -> Result<RefMut<'a, Self>> {
@@ -69,7 +69,7 @@ where
 }
 
 pub trait ZcInitialize
-where 
+where
     Self: Pod + Discriminator + Len + OwnerProgram,
 {
     fn try_initialize_zc<'a>(
@@ -205,7 +205,11 @@ where
         signers,
     )?;
 
-    create_account(cpi_ctx, init_accounts.owner_program_id, T::DISCRIMINATED_LEN as u64)?;
+    create_account(
+        cpi_ctx,
+        init_accounts.owner_program_id,
+        T::DISCRIMINATED_LEN as u64,
+    )?;
 
     let mut data = target_account.try_borrow_mut_data()?;
 

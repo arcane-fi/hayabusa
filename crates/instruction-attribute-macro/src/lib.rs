@@ -5,7 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{format_ident, quote};
 use syn::{
-    parse_macro_input, FnArg, Ident, ItemFn, Pat, PatIdent, PatType, ReturnType, Type, LitStr,
+    parse_macro_input, FnArg, Ident, ItemFn, LitStr, Pat, PatIdent, PatType, ReturnType, Type,
 };
 
 #[proc_macro_attribute]

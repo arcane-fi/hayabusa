@@ -3,9 +3,14 @@
 
 use crate::{write_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
-use hayabusa_cpi::{CpiCtx, CheckProgramId};
+use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, cpi::{invoke, invoke_signed}, instruction::{AccountMeta, Instruction}, pubkey::Pubkey};
+use pinocchio::{
+    account_info::AccountInfo,
+    cpi::{invoke, invoke_signed},
+    instruction::{AccountMeta, Instruction},
+    pubkey::Pubkey,
+};
 
 pub struct MintToChecked<'a> {
     /// Mint account
@@ -28,11 +33,7 @@ pub fn mint_to_checked<'a>(
     amount: u64,
     decimals: u8,
 ) -> Result<()> {
-    let infos = [
-        cpi_ctx.mint,
-        cpi_ctx.destination,
-        cpi_ctx.authority,
-    ];
+    let infos = [cpi_ctx.mint, cpi_ctx.destination, cpi_ctx.authority];
 
     let metas = [
         AccountMeta::writable(cpi_ctx.mint.key()),
@@ -53,7 +54,7 @@ pub fn mint_to_checked<'a>(
     let ix = Instruction {
         program_id: &crate::ID,
         accounts: &metas,
-        data: unsafe { from_raw_parts(ix_data.as_ptr() as _, 10) }
+        data: unsafe { from_raw_parts(ix_data.as_ptr() as _, 10) },
     };
 
     if let Some(signers) = cpi_ctx.signers {
