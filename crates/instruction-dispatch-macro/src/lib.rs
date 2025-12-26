@@ -37,7 +37,7 @@ macro_rules! dispatch {
         match disc {
             $(
                 <$IxTy>::DISCRIMINATOR => {
-                    let ix = <$IxTy as DecodeIx>::decode(rest)
+                    let ix = <$IxTy as DecodeIx<'_>>::decode(rest)
                         .map_err(|_| ProgramError::InvalidInstructionData)?;
 
                     let ctx = Ctx::construct($accounts)?;
