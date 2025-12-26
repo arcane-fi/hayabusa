@@ -27,7 +27,7 @@ pub trait AccountInitializer<'a, 'b>
 where
     'a: 'b,
 {
-    fn initialize_account(&self, account_data: &'b mut [u8]) -> Result<()>;
+    fn initialize_account(&self, account_data: &[u8]) -> Result<()>;
 }
 
 pub trait WritableAllowed {}
