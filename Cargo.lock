@@ -235,7 +235,6 @@ dependencies = [
  "hayabusa-errors",
  "hayabusa-errors-attribute-macro",
  "hayabusa-from-account-infos-derive",
- "hayabusa-instruction-attribute-macro",
  "hayabusa-instruction-dispatch-macro",
  "hayabusa-len-derive",
  "hayabusa-owner-program-derive",
@@ -337,15 +336,6 @@ dependencies = [
 
 [[package]]
 name = "hayabusa-from-account-infos-derive"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "hayabusa-instruction-attribute-macro"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

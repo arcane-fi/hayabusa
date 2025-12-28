@@ -32,7 +32,6 @@ hayabusa-pda = { version = "0.1.0", path = "crates/pda" }
 hayabusa-utility = { version = "0.1.0", path = "crates/utility" }
 hayabusa-context = { version = "0.1.0", path = "crates/context" }
 hayabusa-ser = { version = "0.1.0", path = "crates/ser" }
-hayabusa-instruction-attribute-macro = { version = "0.1.0", path = "crates/instruction-attribute-macro" }
 hayabusa-instruction-dispatch-macro = { version = "0.1.0", path = "crates/instruction-dispatch-macro" }
 hayabusa-len-derive = { version = "0.1.0", path = "crates/len-derive" }
 hayabusa-owner-program-derive = { version = "0.1.0", path = "crates/owner-program-derive" }

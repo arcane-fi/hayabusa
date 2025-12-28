@@ -26,7 +26,6 @@ hayabusa-accounts.workspace = true
 hayabusa-context.workspace = true
 hayabusa-utility.workspace = true
 hayabusa-ser.workspace = true
-hayabusa-instruction-attribute-macro.workspace = true
 hayabusa-instruction-dispatch-macro.workspace = true
 hayabusa-len-derive.workspace = true
 hayabusa-owner-program-derive.workspace = true

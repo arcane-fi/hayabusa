@@ -24,7 +24,6 @@ pub mod prelude {
     pub use hayabusa_errors::{ErrorCode, Result};
     pub use hayabusa_errors_attribute_macro::error;
     pub use hayabusa_from_account_infos_derive::FromAccountInfos;
-    pub use hayabusa_instruction_attribute_macro::instruction;
     pub use hayabusa_instruction_dispatch_macro::dispatch;
     pub use hayabusa_len_derive::Len;
     pub use hayabusa_owner_program_derive::OwnerProgram;
