@@ -1143,9 +1143,11 @@ dependencies = [
  "hayabusa-accounts",
  "hayabusa-context",
  "hayabusa-cpi",
+ "hayabusa-decode-instruction",
  "hayabusa-discriminator",
  "hayabusa-discriminator-derive",
  "hayabusa-errors",
+ "hayabusa-errors-attribute-macro",
  "hayabusa-from-account-infos-derive",
  "hayabusa-instruction-attribute-macro",
  "hayabusa-instruction-dispatch-macro",
@@ -1154,6 +1156,7 @@ dependencies = [
  "hayabusa-pda",
  "hayabusa-ser",
  "hayabusa-ser-derive",
+ "hayabusa-system-program",
  "hayabusa-utility",
  "pinocchio",
  "pinocchio-pubkey",
@@ -1200,6 +1203,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "hayabusa-decode-instruction"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "hayabusa-errors",
+ "pinocchio",
+]
+
+[[package]]
 name = "hayabusa-discriminator"
 version = "0.1.0"
 
@@ -1218,6 +1230,15 @@ name = "hayabusa-errors"
 version = "0.1.0"
 dependencies = [
  "pinocchio",
+]
+
+[[package]]
+name = "hayabusa-errors-attribute-macro"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
 ]
 
 [[package]]

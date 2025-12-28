@@ -6,13 +6,14 @@ use hayabusa::prelude::*;
 
 declare_id!("HPoDm7Kf63B6TpFKV7S8YSd7sGde6sVdztiDBEVkfuxz");
 
+no_allocator!();
+nostd_panic_handler!();
+
 #[cfg(not(feature = "no-entrypoint"))]
 mod entrypoint {
     use super::*;
 
     program_entrypoint!(program_entrypoint);
-    no_allocator!();
-    nostd_panic_handler!();
 
     pub fn program_entrypoint(
         program_id: &Pubkey,
@@ -29,7 +30,12 @@ mod entrypoint {
     }
 }
 
-#[instruction] // generates UpdateCounterInstruction { amount: u64 } + Discriminator
+#[derive(Clone, Copy, Pod, Zeroable, Discriminator)]
+#[repr(C)]
+struct UpdateCounterInstruction {
+    amount: u64, // field name must map identically to the instruction param name, and be in the same order.
+}
+
 fn update_counter<'a>(ctx: Ctx<'a, UpdateCounter<'a>>, amount: u64) -> Result<()> {
     let mut counter = ctx.counter.try_deserialize_mut()?;
 
@@ -57,7 +63,10 @@ impl<'a> FromAccountInfos<'a> for UpdateCounter<'a> {
     }
 }
 
-#[instruction]
+#[derive(Clone, Copy, Pod, Zeroable, Discriminator)]
+#[repr(C)]
+struct InitializeCounterInstruction {}
+
 fn initialize_counter<'a>(ctx: Ctx<'a, InitializeCounter<'a>>) -> Result<()> {
     // account is zeroed on init
     let _ = ctx.counter.try_initialize(

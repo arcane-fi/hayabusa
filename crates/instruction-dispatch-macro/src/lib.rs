@@ -37,7 +37,7 @@ macro_rules! dispatch {
         match disc {
             $(
                 <$IxTy>::DISCRIMINATOR => {
-                    let ix = <$IxTy as DecodeIx<'_>>::decode(rest)
+                    let ix = <$IxTy as DecodeIx>::decode(rest)
                         .map_err(|_| ProgramError::InvalidInstructionData)?;
 
                     let ctx = Ctx::construct($accounts)?;
@@ -45,12 +45,13 @@ macro_rules! dispatch {
                         .map_err(Into::into);
                 }
             )+
+            _ => {
+                fail_with_ctx!(
+                    "HAYABUSA_DISPATCH_UNKNOWN_IX",
+                    ErrorCode::UnknownInstruction,
+                    disc,
+                );
+            }
         }
-
-        fail_with_ctx!(
-            "HAYABUSA_DISPATCH_UNKNOWN_IX",
-            ErrorCode::UnknownInstruction,
-            disc,
-        );
     }};
 }
