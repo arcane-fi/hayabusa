@@ -17,13 +17,13 @@ where
 /// ## Context
 ///
 /// A context consists of a set of typed/named accounts `T`
-/// with constraints applied and a remaining accounts iterator.
+/// with constraints applied and a remaining accounts slice
 pub struct Ctx<'a, T>
 where
     T: FromAccountInfos<'a>,
 {
     pub accounts: T,
-    pub remaining_accounts: AccountIter<'a>,
+    pub remaining_accounts: &'a [AccountInfo],
 }
 
 impl<'a, T> Ctx<'a, T>
@@ -38,8 +38,13 @@ where
 
         Ok(Ctx {
             accounts,
-            remaining_accounts: iter,
+            remaining_accounts: &account_infos.get(iter.index..).unwrap_or(&[]),
         })
+    }
+
+    #[inline(always)]
+    pub fn remaining_accounts(&self) -> AccountIter<'a> {
+        AccountIter::new(self.remaining_accounts)
     }
 }
 
@@ -81,5 +86,10 @@ impl<'a> AccountIter<'a> {
         self.index += 1;
 
         Ok(account_info)
+    }
+
+    #[inline(always)]
+    pub fn into_subslice(&'a self) -> &'a [AccountInfo] {
+        &self.slice[self.index..]
     }
 }
