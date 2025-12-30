@@ -18,7 +18,7 @@ pub mod prelude {
     pub use hayabusa_accounts::*;
     pub use hayabusa_context::*;
     pub use hayabusa_cpi::*;
-    pub use hayabusa_discriminator::Discriminator;
+    pub use hayabusa_discriminator::*;
     pub use hayabusa_discriminator_derive::Discriminator;
     pub use hayabusa_decode_instruction::*;
     pub use hayabusa_errors::{ErrorCode, Result};
