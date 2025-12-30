@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{write_bytes, UNINIT_BYTE};
+use hayabusa_utility::{write_uninit_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
@@ -47,9 +47,9 @@ pub fn mint_to_checked<'ix>(
     // - [9]: decimals
     let mut ix_data = [UNINIT_BYTE; 10];
 
-    write_bytes(&mut ix_data, &DISCRIMINATOR);
-    write_bytes(&mut ix_data[1..9], &amount.to_le_bytes());
-    write_bytes(&mut ix_data[9..], &[decimals]);
+    write_uninit_bytes(&mut ix_data, &DISCRIMINATOR);
+    write_uninit_bytes(&mut ix_data[1..9], &amount.to_le_bytes());
+    write_uninit_bytes(&mut ix_data[9..], &[decimals]);
 
     let ix = Instruction {
         program_id: &crate::ID,

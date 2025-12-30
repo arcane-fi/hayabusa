@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{write_bytes, UNINIT_BYTE};
+use hayabusa_utility::{write_uninit_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
@@ -41,9 +41,9 @@ pub fn initialize_account3<'ix>(
     let mut instruction_data = [UNINIT_BYTE; 33];
 
     // Set discriminator as u8 at offset [0]
-    write_bytes(&mut instruction_data, &DISCRIMINATOR);
+    write_uninit_bytes(&mut instruction_data, &DISCRIMINATOR);
     // Set owner as [u8; 32] at offset [1..33]
-    write_bytes(&mut instruction_data[1..], owner_pk);
+    write_uninit_bytes(&mut instruction_data[1..], owner_pk);
 
     let instruction = Instruction {
         program_id: &crate::ID,

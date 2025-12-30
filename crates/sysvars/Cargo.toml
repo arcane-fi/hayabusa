@@ -1,12 +1,12 @@
 [package]
-name = "hayabusa-discriminator"
+name = "hayabusa-sysvars"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
-description = "Hayabusa discriminator"
+description = "Hayabusa Solana sysvars interface"
 
 [dependencies]
 pinocchio.workspace = true

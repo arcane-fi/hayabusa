@@ -307,6 +307,11 @@ dependencies = [
 [[package]]
 name = "hayabusa-discriminator"
 version = "0.1.0"
+dependencies = [
+ "hayabusa-errors",
+ "hayabusa-utility",
+ "pinocchio",
+]
 
 [[package]]
 name = "hayabusa-discriminator-derive"
@@ -407,6 +412,15 @@ dependencies = [
  "hayabusa-errors",
  "pinocchio",
  "pinocchio-pubkey",
+]
+
+[[package]]
+name = "hayabusa-sysvars"
+version = "0.1.0"
+dependencies = [
+ "hayabusa-errors",
+ "hayabusa-utility",
+ "pinocchio",
 ]
 
 [[package]]

@@ -8,6 +8,7 @@ pub mod macros;
 
 use hayabusa_errors::Result;
 use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
+use core::mem::MaybeUninit;
 
 pub trait Len
 where
@@ -32,5 +33,14 @@ pub trait OwnerProgram {
 
     fn owner() -> Pubkey {
         Self::OWNER
+    }
+}
+
+pub const UNINIT_BYTE: MaybeUninit<u8> = MaybeUninit::<u8>::uninit();
+
+#[inline(always)]
+pub fn write_uninit_bytes(destination: &mut [MaybeUninit<u8>], source: &[u8]) {
+    for (d, s) in destination.iter_mut().zip(source.iter()) {
+        d.write(*s);
     }
 }

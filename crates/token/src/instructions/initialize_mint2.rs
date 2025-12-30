@@ -1,10 +1,10 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{write_bytes, UNINIT_BYTE};
 use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
+use hayabusa_utility::{UNINIT_BYTE, write_uninit_bytes};
 use pinocchio::{
     account_info::AccountInfo,
     cpi::{invoke, invoke_signed},
@@ -43,19 +43,19 @@ pub fn initialize_mint2<'ix>(
     let mut length = instruction_data.len();
 
     // Set discriminator as u8 at offset [0]
-    write_bytes(&mut instruction_data, &DISCRIMINATOR);
+    write_uninit_bytes(&mut instruction_data, &DISCRIMINATOR);
     // Set decimals as u8 at offset [1]
-    write_bytes(&mut instruction_data[1..2], &[decimals]);
+    write_uninit_bytes(&mut instruction_data[1..2], &[decimals]);
     // Set mint_authority as Pubkey at offset [2..34]
-    write_bytes(&mut instruction_data[2..34], mint_authority);
+    write_uninit_bytes(&mut instruction_data[2..34], mint_authority);
 
     if let Some(freeze_auth) = freeze_authority {
         // Set Option = `true` & freeze_authority at offset [34..67]
-        write_bytes(&mut instruction_data[34..35], &[1]);
-        write_bytes(&mut instruction_data[35..], freeze_auth);
+        write_uninit_bytes(&mut instruction_data[34..35], &[1]);
+        write_uninit_bytes(&mut instruction_data[35..], freeze_auth);
     } else {
         // Set Option = `false`
-        write_bytes(&mut instruction_data[34..35], &[0]);
+        write_uninit_bytes(&mut instruction_data[34..35], &[0]);
         // Adjust length if no freeze authority
         length = 35;
     }
