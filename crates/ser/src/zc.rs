@@ -24,10 +24,6 @@ use pinocchio::{
 /// You must ensure proper alignment of Self
 pub unsafe trait RawZcDeserialize: Sized + FromBytesUnchecked + Zc + Deserialize {
     fn try_deserialize_raw<'ix>(account_info: &'ix AccountInfo) -> Result<Ref<'ix, Self>>;
-
-    unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> &Self {
-        Self::from_bytes_unchecked(account_info.borrow_data_unchecked())
-    }
 }
 
 /// # Safety
@@ -41,41 +37,50 @@ where
 
 pub trait RawZcDeserializeUnchecked
 where
-    Self: Sized + FromBytesUnchecked + Zc + Deserialize,
+    Self: Sized + FromBytesUnchecked + Zc + Deserialize + Discriminator,
 {
     /// # Safety
-    /// Caller must ensure the account data is properly aligned
+    /// Caller must ensure the account data is properly aligned to be cast to `Self`
+    /// 
     /// and that there are no mutable references to the underlying `AccountInfo` data
+    /// 
+    /// and that the `AccountInfo` data slice len is >8 (to account for discriminator, account data starts at index 8)
     unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> &Self {
-        Self::from_bytes_unchecked(account_info.borrow_data_unchecked())
+        let undiscriminated_account_data = &account_info.borrow_data_unchecked()[8..];
+        Self::from_bytes_unchecked(undiscriminated_account_data)
     }
 }
 
 pub trait RawZcDeserializeUncheckedMut
 where
-    Self: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut,
+    Self: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut + Discriminator,
 {
     /// # Safety
-    /// Caller must ensure the account data is properly aligned
-    /// and that there are no other references to the underlying `AccountInfo` data
+    /// Caller must ensure the account data is properly aligned to be cast to `Self`,
+    /// 
+    /// that there are no other references to the underlying `AccountInfo` data,
+    /// 
+    /// and that the `AccountInfo` data slice len is >8 (to account for discriminator, account data starts at index 8)
     unsafe fn deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> &mut Self {
-        Self::from_bytes_unchecked_mut(account_info.borrow_mut_data_unchecked())
+        let undiscriminated_account_data = &mut account_info.borrow_mut_data_unchecked()[8..];
+        Self::from_bytes_unchecked_mut(undiscriminated_account_data)
     }
 }
 
-impl<T> RawZcDeserializeUnchecked for T where T: FromBytesUnchecked + Zc + Deserialize {}
-impl<T> RawZcDeserializeUncheckedMut for T where T: FromBytesUnchecked + Zc + Deserialize + DeserializeMut {}
+impl<T> RawZcDeserializeUnchecked for T where T: FromBytesUnchecked + Zc + Deserialize + Discriminator {}
+impl<T> RawZcDeserializeUncheckedMut for T where T: FromBytesUnchecked + Zc + Deserialize + DeserializeMut + Discriminator {}
 
 /// Unsafe to call either trait method
+/// 
 /// You must ensure proper alignment of Self
 pub trait FromBytesUnchecked: Sized {
     /// # Safety
-    /// You must ensure proper alignment of Self
+    /// You must ensure proper alignment of Self, and bytes.len() == size_of::<Self>()
     unsafe fn from_bytes_unchecked(bytes: &[u8]) -> &Self {
         &*(bytes.as_ptr() as *const Self)
     }
     /// # Safety
-    /// You must ensure proper alignment of Self
+    /// You must ensure proper alignment of Self, and bytes.len() == size_of::<Self>()
     unsafe fn from_bytes_unchecked_mut(bytes: &mut [u8]) -> &mut Self {
         &mut *(bytes.as_mut_ptr() as *mut Self)
     }

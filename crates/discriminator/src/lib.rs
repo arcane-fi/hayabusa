@@ -13,6 +13,7 @@ pub trait Discriminator {
 
 /// # Safety
 /// This function assumes account data is at least 8 bytes long, and that the data can safely be borrowed
+#[inline(always)]
 pub unsafe fn get_discriminator_unchecked(account_info: &AccountInfo) -> [u8; 8] {
     let data = account_info.borrow_data_unchecked();
     let mut disc = [UNINIT_BYTE; 8];
@@ -22,6 +23,7 @@ pub unsafe fn get_discriminator_unchecked(account_info: &AccountInfo) -> [u8; 8]
     core::mem::transmute(disc)
 }
 
+#[inline(always)]
 pub fn get_discriminator(account_info: &AccountInfo) -> Result<[u8; 8]> {
     if unlikely(account_info.data_len() < 8) {
         fail_with_ctx!(
