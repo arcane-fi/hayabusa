@@ -16,9 +16,9 @@ impl<'ix> FromAccountInfo<'ix> for UncheckedAccount<'ix> {
     }
 }
 
-impl<'ix> ToAccountInfo<'ix> for UncheckedAccount<'ix> {
+impl ToAccountInfo for UncheckedAccount<'_> {
     #[inline(always)]
-    fn to_account_info(&self) -> &'ix AccountInfo {
+    fn to_account_info(&self) -> &AccountInfo {
         self.account_info
     }
 }
@@ -30,10 +30,10 @@ impl Key for UncheckedAccount<'_> {
     }
 }
 
-impl<'ix> core::ops::Deref for UncheckedAccount<'ix> {
+impl core::ops::Deref for UncheckedAccount<'_> {
     type Target = AccountInfo;
 
-    fn deref(&self) -> &'ix Self::Target {
+    fn deref(&self) -> &Self::Target {
         self.account_info
     }
 }

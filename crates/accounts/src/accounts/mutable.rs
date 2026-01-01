@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use core::ops::Deref;
 use hayabusa_errors::{ErrorCode, Result};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
 
 pub struct Mut<'ix, T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo<'ix> + Key + WritableAllowed,
+    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
 {
     pub account: T,
     _phantom: core::marker::PhantomData<&'ix AccountInfo>,
@@ -16,7 +17,7 @@ where
 
 impl<'ix, T> FromAccountInfo<'ix> for Mut<'ix, T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo<'ix> + Key + WritableAllowed,
+    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
 {
     #[inline(always)]
     fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
@@ -35,19 +36,19 @@ where
     }
 }
 
-impl<'ix, T> ToAccountInfo<'ix> for Mut<'ix, T>
+impl<'ix, T> ToAccountInfo for Mut<'ix, T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo<'ix> + Key + WritableAllowed,
+    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
 {
     #[inline(always)]
-    fn to_account_info(&self) -> &'ix AccountInfo {
+    fn to_account_info(&self) -> &AccountInfo {
         self.account.to_account_info()
     }
 }
 
 impl<'ix, T> Key for Mut<'ix, T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo<'ix> + Key + WritableAllowed,
+    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
 {
     #[inline(always)]
     fn key(&self) -> &Pubkey {
@@ -55,9 +56,9 @@ where
     }
 }
 
-impl<'ix, T> core::ops::Deref for Mut<'ix, T>
+impl<'ix, T> Deref for Mut<'ix, T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo<'ix> + Key + WritableAllowed,
+    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed + Deref<Target = AccountInfo>,
 {
     type Target = T;
 

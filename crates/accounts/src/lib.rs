@@ -19,8 +19,8 @@ pub trait Key {
     fn key(&self) -> &Pubkey;
 }
 
-pub trait ToAccountInfo<'ix> {
-    fn to_account_info(&self) -> &'ix AccountInfo;
+pub trait ToAccountInfo {
+    fn to_account_info(&self) -> &AccountInfo;
 }
 
 pub trait AccountInitializer<'ix, 'b>

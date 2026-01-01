@@ -3,9 +3,9 @@
 
 #![no_std]
 
-use pinocchio::{account_info::AccountInfo, hint::unlikely};
 use hayabusa_errors::{ErrorCode, Result};
 use hayabusa_utility::{fail_with_ctx, write_uninit_bytes, UNINIT_BYTE};
+use pinocchio::{account_info::AccountInfo, hint::unlikely};
 
 pub trait Discriminator {
     const DISCRIMINATOR: &'static [u8];
@@ -19,7 +19,7 @@ pub unsafe fn get_discriminator_unchecked(account_info: &AccountInfo) -> [u8; 8]
     let mut disc = [UNINIT_BYTE; 8];
 
     write_uninit_bytes(&mut disc, &data[..8]);
-    
+
     core::mem::transmute(disc)
 }
 

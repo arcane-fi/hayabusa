@@ -6,9 +6,9 @@
 #[macro_use]
 pub mod macros;
 
+use core::mem::MaybeUninit;
 use hayabusa_errors::Result;
 use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
-use core::mem::MaybeUninit;
 
 pub trait Len
 where

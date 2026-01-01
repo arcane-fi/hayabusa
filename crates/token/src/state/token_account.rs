@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::AccountState;
-use hayabusa_ser::{Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc};
 use hayabusa_errors::Result;
+use hayabusa_ser::{
+    Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc,
+};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
     account_info::{AccountInfo, Ref},
@@ -59,9 +61,7 @@ impl Deserialize for TokenAccount {}
 
 unsafe impl RawZcDeserialize for TokenAccount {
     #[inline]
-    fn try_deserialize_raw(
-        account_info: &AccountInfo,
-    ) -> Result<Ref<Self>> {
+    fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<Self>> {
         if unlikely(account_info.data_len() != Self::LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_TOKEN_ACCOUNT_DATA_TOO_SHORT",
@@ -88,7 +88,7 @@ unsafe impl RawZcDeserialize for TokenAccount {
 
 impl RawZcDeserializeUnchecked for TokenAccount {
     #[inline(always)]
-    unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
+    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
         if unlikely(account_info.data_len() != Self::LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_RAW_TOKEN_ACCOUNT_DATA_TOO_SHORT",
@@ -107,7 +107,9 @@ impl RawZcDeserializeUnchecked for TokenAccount {
             );
         }
 
-        Ok(Self::from_bytes_unchecked(account_info.borrow_data_unchecked()))
+        Ok(Self::from_bytes_unchecked(
+            account_info.borrow_data_unchecked(),
+        ))
     }
 }
 

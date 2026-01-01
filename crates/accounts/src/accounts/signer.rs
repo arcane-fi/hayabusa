@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use core::ops::Deref;
 use hayabusa_errors::{ErrorCode, Result};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
@@ -25,9 +26,9 @@ impl<'ix> FromAccountInfo<'ix> for Signer<'ix> {
     }
 }
 
-impl<'ix> ToAccountInfo<'ix> for Signer<'ix> {
+impl ToAccountInfo for Signer<'_> {
     #[inline(always)]
-    fn to_account_info(&self) -> &'ix AccountInfo {
+    fn to_account_info(&self) -> &AccountInfo {
         self.account_info
     }
 }
@@ -40,3 +41,12 @@ impl Key for Signer<'_> {
 }
 
 impl WritableAllowed for Signer<'_> {}
+
+impl Deref for Signer<'_> {
+    type Target = AccountInfo;
+
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.account_info
+    }
+}

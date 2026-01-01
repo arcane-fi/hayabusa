@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountInfo, Key, ProgramId, ToAccountInfo};
+use core::ops::Deref;
 use hayabusa_errors::Result;
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
@@ -38,12 +39,12 @@ where
     }
 }
 
-impl<'ix, T> ToAccountInfo<'ix> for Program<'ix, T>
+impl<T> ToAccountInfo for Program<'_, T>
 where
     T: ProgramId,
 {
     #[inline(always)]
-    fn to_account_info(&self) -> &'ix AccountInfo {
+    fn to_account_info(&self) -> &AccountInfo {
         self.account_info
     }
 }
@@ -55,6 +56,15 @@ where
     #[inline(always)]
     fn key(&self) -> &Pubkey {
         self.account_info.key()
+    }
+}
+
+impl<T: ProgramId> Deref for Program<'_, T> {
+    type Target = AccountInfo;
+
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.account_info
     }
 }
 

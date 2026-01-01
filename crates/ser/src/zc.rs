@@ -22,8 +22,41 @@ use pinocchio::{
 
 /// # Safety
 /// You must ensure proper alignment of Self
-pub unsafe trait RawZcDeserialize: Sized + FromBytesUnchecked + Zc + Deserialize {
+pub unsafe trait RawZcDeserialize
+where
+    Self: Sized + FromBytesUnchecked + Zc + Deserialize,
+{
     fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<Self>>;
+}
+
+// # Safety
+// We constrain with Pod for the blanket implementation to remove the alignment footgun
+unsafe impl<T> RawZcDeserialize for T
+where
+    T: Sized + FromBytesUnchecked + Zc + Deserialize + Discriminator + Len + OwnerProgram + Pod,
+{
+    #[inline(always)]
+    fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<T>> {
+        if unlikely(!account_info.is_owned_by(&T::OWNER)) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_WRONG_OWNER",
+                ProgramError::InvalidAccountOwner,
+                account_info.key(),
+            );
+        }
+
+        if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_WRONG_DATA_LEN",
+                ProgramError::InvalidAccountData,
+                account_info.key(),
+            );
+        }
+
+        Ok(Ref::map(account_info.try_borrow_data()?, |d| unsafe {
+            T::from_bytes_unchecked(&d[8..])
+        }))
+    }
 }
 
 /// # Safety
@@ -35,25 +68,71 @@ where
     fn try_deserialize_raw_mut(account_info: &AccountInfo) -> Result<RefMut<Self>>;
 }
 
+// # Safety
+// We constrain with Pod for the blanket implementation to remove the alignment footgun
+unsafe impl<T> RawZcDeserializeMut for T
+where
+    T: Sized
+        + FromBytesUnchecked
+        + Zc
+        + Deserialize
+        + DeserializeMut
+        + Discriminator
+        + Len
+        + OwnerProgram
+        + Pod,
+{
+    fn try_deserialize_raw_mut(account_info: &AccountInfo) -> Result<RefMut<Self>> {
+        if unlikely(!account_info.is_owned_by(&T::OWNER)) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_MUT_WRONG_OWNER",
+                ProgramError::InvalidAccountOwner,
+                account_info.key(),
+            );
+        }
+
+        if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_MUT_WRONG_DATA_LEN",
+                ProgramError::InvalidAccountData,
+                account_info.key(),
+            );
+        }
+
+        Ok(RefMut::map(
+            account_info.try_borrow_mut_data()?,
+            |d| unsafe { T::from_bytes_unchecked_mut(&mut d[8..]) },
+        ))
+    }
+}
+
 pub trait RawZcDeserializeUnchecked
 where
     Self: Sized + FromBytesUnchecked + Zc + Deserialize,
 {
     /// # Safety
     /// Caller must ensure the account data is properly aligned to be cast to `Self`
-    /// 
+    ///
     /// and that there are no mutable references to the underlying `AccountInfo` data
-    /// 
+    ///
     /// and that the `AccountInfo` data slice len is >8 (to account for discriminator, account data starts at index 8)
-    unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self>;
+    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self>;
 }
 
 impl<T> RawZcDeserializeUnchecked for T
-where 
+where
     T: Sized + FromBytesUnchecked + Zc + Deserialize + Discriminator + Len + OwnerProgram,
 {
     #[inline(always)]
-    unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
+    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
+        if unlikely(!account_info.is_owned_by(&T::OWNER)) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_UNCHECKED_WRONG_OWNER",
+                ProgramError::InvalidAccountOwner,
+                account_info.key(),
+            );
+        }
+
         if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_RAW_UNCHECKED_WRONG_DATA_LEN",
@@ -62,14 +141,6 @@ where
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&T::OWNER)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_WRONG_OWNER",
-                ProgramError::InvalidAccountOwner,
-                account_info.key(),
-            );
-        }
-        
         let undiscriminated_account_data = &account_info.borrow_data_unchecked()[8..];
 
         Ok(Self::from_bytes_unchecked(undiscriminated_account_data))
@@ -82,31 +153,38 @@ where
 {
     /// # Safety
     /// Caller must ensure the account data is properly aligned to be cast to `Self`,
-    /// 
+    ///
     /// that there are no other references to the underlying `AccountInfo` data,
-    /// 
+    ///
     /// and that the `AccountInfo` data slice len is >8 (to account for discriminator, account data starts at index 8)
-    unsafe fn deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> Result<&mut Self>;
+    unsafe fn try_deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> Result<&mut Self>;
 }
 
 impl<T> RawZcDeserializeUncheckedMut for T
-where 
-    T: Sized + FromBytesUnchecked + Zc + Deserialize + DeserializeMut + Discriminator + Len + OwnerProgram,
+where
+    T: Sized
+        + FromBytesUnchecked
+        + Zc
+        + Deserialize
+        + DeserializeMut
+        + Discriminator
+        + Len
+        + OwnerProgram,
 {
     #[inline(always)]
-    unsafe fn deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> Result<&mut Self> {
-        if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_MUT_WRONG_DATA_LEN",
-                ProgramError::InvalidAccountData,
-                account_info.key(),
-            );
-        }
-
+    unsafe fn try_deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> Result<&mut Self> {
         if unlikely(!account_info.is_owned_by(&T::OWNER)) {
             fail_with_ctx!(
                 "HAYABUSA_SER_RAW_UNCHECKED_MUT_WRONG_OWNER",
                 ProgramError::InvalidAccountOwner,
+                account_info.key(),
+            );
+        }
+
+        if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
+            fail_with_ctx!(
+                "HAYABUSA_SER_RAW_UNCHECKED_MUT_WRONG_DATA_LEN",
+                ProgramError::InvalidAccountData,
                 account_info.key(),
             );
         }
@@ -118,7 +196,7 @@ where
 }
 
 /// Unsafe to call either trait method
-/// 
+///
 /// You must ensure proper alignment of Self
 pub trait FromBytesUnchecked: Sized {
     /// # Safety
@@ -258,7 +336,7 @@ where
 }
 
 impl<'ix, 'b> InitAccounts<'ix, 'b>
-where 
+where
     'ix: 'b,
 {
     #[inline(always)]

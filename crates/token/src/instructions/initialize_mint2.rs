@@ -4,7 +4,7 @@
 use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use hayabusa_utility::{UNINIT_BYTE, write_uninit_bytes};
+use hayabusa_utility::{write_uninit_bytes, UNINIT_BYTE};
 use pinocchio::{
     account_info::AccountInfo,
     cpi::{invoke, invoke_signed},

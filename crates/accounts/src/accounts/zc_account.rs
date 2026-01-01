@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use core::ops::Deref;
 use hayabusa_errors::Result;
 use hayabusa_ser::{
-    Deserialize, InitAccounts, RawZcDeserialize, RawZcDeserializeMut, Zc, ZcDeserialize,
-    ZcDeserializeMut, ZcInitialize,
+    Deserialize, InitAccounts, RawZcDeserialize, RawZcDeserializeMut, RawZcDeserializeUnchecked,
+    RawZcDeserializeUncheckedMut, Zc, ZcDeserialize, ZcDeserializeMut, ZcInitialize,
 };
 use pinocchio::{
     account_info::{AccountInfo, Ref, RefMut},
@@ -68,13 +69,33 @@ where
     }
 }
 
-impl<'ix, T> ZcAccount<'ix, T>
+impl<T> ZcAccount<'_, T>
 where
     T: RawZcDeserialize + RawZcDeserializeMut,
 {
     #[inline(always)]
-    pub fn try_deserialize_raw_mut(&self) -> Result<RefMut<'ix, T>> {
+    pub fn try_deserialize_raw_mut(&self) -> Result<RefMut<T>> {
         T::try_deserialize_raw_mut(self.account_info)
+    }
+}
+
+impl<T> ZcAccount<'_, T>
+where
+    T: RawZcDeserializeUnchecked,
+{
+    #[inline(always)]
+    pub unsafe fn try_deserialize_raw_unchecked(&self) -> Result<&T> {
+        T::try_deserialize_raw_unchecked(self.account_info)
+    }
+}
+
+impl<T> ZcAccount<'_, T>
+where
+    T: RawZcDeserializeUnchecked + RawZcDeserializeUncheckedMut,
+{
+    #[inline(always)]
+    pub unsafe fn try_deserialize_raw_unchecked_mut(&self) -> Result<&mut T> {
+        T::try_deserialize_raw_unchecked_mut(self.account_info)
     }
 }
 
@@ -91,12 +112,12 @@ where
     }
 }
 
-impl<'ix, T> ToAccountInfo<'ix> for ZcAccount<'ix, T>
+impl<T> ToAccountInfo for ZcAccount<'_, T>
 where
     T: Zc + Deserialize,
 {
     #[inline(always)]
-    fn to_account_info(&self) -> &'ix AccountInfo {
+    fn to_account_info(&self) -> &AccountInfo {
         self.account_info
     }
 }
@@ -112,3 +133,15 @@ where
 }
 
 impl<T> WritableAllowed for ZcAccount<'_, T> where T: Zc + Deserialize {}
+
+impl<T> Deref for ZcAccount<'_, T>
+where
+    T: Zc + Deserialize,
+{
+    type Target = AccountInfo;
+
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.account_info
+    }
+}

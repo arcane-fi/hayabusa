@@ -1,8 +1,10 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use hayabusa_ser::{Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc};
 use hayabusa_errors::Result;
+use hayabusa_ser::{
+    Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc,
+};
 use hayabusa_utility::fail_with_ctx;
 use pinocchio::{
     account_info::{AccountInfo, Ref},
@@ -30,9 +32,7 @@ impl Zc for Multisig {}
 impl Deserialize for Multisig {}
 
 unsafe impl RawZcDeserialize for Multisig {
-    fn try_deserialize_raw(
-        account_info: &AccountInfo,
-    ) -> hayabusa_errors::Result<Ref<Self>> {
+    fn try_deserialize_raw(account_info: &AccountInfo) -> hayabusa_errors::Result<Ref<Self>> {
         if unlikely(account_info.data_len() != Self::LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_MULTISIG_ACCOUNT_DATA_TOO_SHORT",
@@ -59,7 +59,7 @@ unsafe impl RawZcDeserialize for Multisig {
 
 impl RawZcDeserializeUnchecked for Multisig {
     #[inline(always)]
-    unsafe fn deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
+    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
         if unlikely(account_info.data_len() != Self::LEN) {
             fail_with_ctx!(
                 "HAYABUSA_SER_RAW_MULTISIG_ACCOUNT_DATA_TOO_SHORT",
@@ -78,7 +78,9 @@ impl RawZcDeserializeUnchecked for Multisig {
             );
         }
 
-        Ok(Self::from_bytes_unchecked(account_info.borrow_data_unchecked()))
+        Ok(Self::from_bytes_unchecked(
+            account_info.borrow_data_unchecked(),
+        ))
     }
 }
 

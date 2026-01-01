@@ -3,9 +3,9 @@
 
 #![no_std]
 
+use bytemuck::Pod;
 use hayabusa_errors::Result;
 use pinocchio::program_error::ProgramError;
-use bytemuck::Pod;
 
 pub trait DecodeIx<'ix> {
     type Target;
@@ -14,14 +14,13 @@ pub trait DecodeIx<'ix> {
 }
 
 impl<'ix, T> DecodeIx<'ix> for T
-where 
+where
     T: Pod,
 {
     type Target = &'ix T;
 
     #[inline(always)]
     fn decode(bytes: &'ix [u8]) -> Result<Self::Target> {
-        bytemuck::try_from_bytes::<T>(bytes)
-            .map_err(|_| ProgramError::InvalidInstructionData)
+        bytemuck::try_from_bytes::<T>(bytes).map_err(|_| ProgramError::InvalidInstructionData)
     }
 }
