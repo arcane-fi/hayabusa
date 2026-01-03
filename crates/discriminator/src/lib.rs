@@ -4,7 +4,7 @@
 #![no_std]
 
 use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::{fail_with_ctx, write_uninit_bytes, UNINIT_BYTE};
+use hayabusa_utility::{error_msg, write_uninit_bytes, UNINIT_BYTE};
 use pinocchio::{account_info::AccountInfo, hint::unlikely};
 
 pub trait Discriminator {
@@ -12,7 +12,7 @@ pub trait Discriminator {
 }
 
 /// # Safety
-/// This function assumes account data is at least 8 bytes long, and that the data can safely be borrowed
+/// This function assumes account data is at least 8 bytes long, and that the data can be safely borrowed
 #[inline(always)]
 pub unsafe fn get_discriminator_unchecked(account_info: &AccountInfo) -> [u8; 8] {
     let data = account_info.borrow_data_unchecked();
@@ -26,8 +26,8 @@ pub unsafe fn get_discriminator_unchecked(account_info: &AccountInfo) -> [u8; 8]
 #[inline(always)]
 pub fn get_discriminator(account_info: &AccountInfo) -> Result<[u8; 8]> {
     if unlikely(account_info.data_len() < 8) {
-        fail_with_ctx!(
-            "HAYABUSA_DATA_TOO_SHORT_FOR_DISC",
+        error_msg!(
+            "hayabusa_discriminator::get_discriminator: account data too short",
             ErrorCode::InvalidAccountDiscriminator,
         );
     }

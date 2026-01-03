@@ -10,4 +10,5 @@ description = "Hayabusa utilities"
 
 [dependencies]
 pinocchio.workspace = true
+pinocchio-log.workspace = true
 hayabusa-errors.workspace = true

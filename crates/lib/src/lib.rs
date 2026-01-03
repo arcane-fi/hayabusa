@@ -47,4 +47,5 @@ pub mod prelude {
         ProgramResult,
     };
     pub use pinocchio_pubkey::declare_id;
+    pub use pinocchio_log::{self, *};
 }

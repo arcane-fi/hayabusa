@@ -4,8 +4,9 @@
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
 use core::ops::Deref;
 use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
+use pinocchio_log::log;
 
 pub struct SystemAccount<'ix> {
     pub account_info: &'ix AccountInfo,
@@ -15,10 +16,9 @@ impl<'ix> FromAccountInfo<'ix> for SystemAccount<'ix> {
     #[inline(always)]
     fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
         if unlikely(account_info.owner() != &hayabusa_system_program::ID) {
-            fail_with_ctx!(
-                "HAYABUSA_INVALID_SYSTEM_ACCOUNT",
+            error_msg!(
+                "SystemAccount::try_from_account_info: invalid account owner, must be system program",
                 ErrorCode::InvalidAccount,
-                account_info.key(),
             );
         }
 

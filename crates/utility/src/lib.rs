@@ -20,9 +20,9 @@ where
 #[inline(always)]
 pub fn take_bytes(data: &[u8], n: usize) -> Result<(&[u8], &[u8])> {
     if data.len() < n {
-        fail_with_ctx!(
-            "HAYABUSA_TAKE_BYTES_INSUFFICIENT_DATA",
-            ProgramError::InvalidInstructionData,
+        error_msg!(
+            "hayabusa_utility::take_bytes: insufficient data",
+            ProgramError::InvalidInstructionData
         );
     }
     Ok(data.split_at(n))
@@ -40,7 +40,17 @@ pub const UNINIT_BYTE: MaybeUninit<u8> = MaybeUninit::<u8>::uninit();
 
 #[inline(always)]
 pub fn write_uninit_bytes(destination: &mut [MaybeUninit<u8>], source: &[u8]) {
-    for (d, s) in destination.iter_mut().zip(source.iter()) {
-        d.write(*s);
+    let len = source.len().min(destination.len());
+    // SAFETY:
+    // MaybeUninit<u8> and u8 have identical memory layouts
+    // We're writing initialized values from source to uninitialized memory
+    // The pointers don't overlap (copy_nonoverlapping requirement)
+    // We respect both slice bounds with min()
+    unsafe {
+        core::ptr::copy_nonoverlapping(
+            source.as_ptr(),
+            destination.as_mut_ptr() as *mut u8,
+            len,
+        );
     }
 }

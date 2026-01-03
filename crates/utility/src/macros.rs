@@ -2,41 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #[macro_export]
-macro_rules! log {
-    ($msg:expr) => {
-        pinocchio::msg!($msg);
-    };
-}
-
-#[macro_export]
-macro_rules! fail {
-    ($tag:literal, $code:expr) => {
-        $crate::log!(concat!("ERROR:", $tag));
-        return program_error!($code);
-    };
-}
-
-#[macro_export]
-macro_rules! fail_with_ctx {
-    ($tag:literal, $code:expr, $($arg:expr),+ $(,)?) => {
-        $crate::log!(concat!("ERROR:", $tag));
-        $crate::dump_raw!($($arg),+);
+macro_rules! error_msg {
+    ($msg:literal, $code:expr $(,)?) => {
+        pinocchio_log::log!($msg);
         $crate::error!($code);
     };
-    ($tag:literal, $code:expr $(,)?) => {
-        $crate::log!(concat!("ERROR:", $tag));
+    ($msg:literal, $code:expr, $($arg:expr),+ $(,)?) => {
+        pinocchio_log::log!($msg, $($arg),+);
         $crate::error!($code);
-    }
-}
-
-#[macro_export]
-macro_rules! fail_with_ctx_no_return {
-    ($tag:literal, $($arg:expr),+ $(,)?) => {
-        $crate::log!(concat!("ERROR:", $tag));
-        $crate::dump_raw!($($arg),+);
-    };
-    ($tag:literal $(,)?) => {
-        $crate::log!(concat!("ERROR:", $tag));
     }
 }
 
@@ -51,22 +24,6 @@ macro_rules! error {
 macro_rules! program_error {
     ($code:expr) => {
         pinocchio::program_error::ProgramError::from($code)
-    };
-}
-
-#[macro_export]
-macro_rules! dump {
-    ($($arg:expr),* $(,)?) => {
-        pinocchio::log::sol_log_data(
-            &[$(bytemuck::bytes_of(&$arg)),*]
-        );
-    };
-}
-
-#[macro_export]
-macro_rules! dump_raw {
-    ($($arg:expr),* $(,)?) => {
-        pinocchio::log::sol_log_data(&[$($arg),*]);
     };
 }
 

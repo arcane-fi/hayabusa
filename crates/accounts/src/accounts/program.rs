@@ -4,10 +4,11 @@
 use crate::{FromAccountInfo, Key, ProgramId, ToAccountInfo};
 use core::ops::Deref;
 use hayabusa_errors::Result;
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{
     account_info::AccountInfo, hint::unlikely, program_error::ProgramError, pubkey::Pubkey,
 };
+use pinocchio_log::log;
 
 pub struct Program<'ix, T>
 where
@@ -24,11 +25,9 @@ where
     #[inline(always)]
     fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
         if unlikely(account_info.key() != &T::ID) {
-            fail_with_ctx!(
-                "HAYABUSA_PROGRAM_ID_MISMATCH",
+            error_msg!(
+                "Program::try_from_account_info: program ID mismatch",
                 ProgramError::IncorrectProgramId,
-                account_info.key(),
-                &T::ID,
             );
         }
 

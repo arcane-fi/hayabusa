@@ -15,20 +15,18 @@ macro_rules! dispatch {
         ),+ $(,)?
     ) => {{
         if unlikely($program_id != &crate::ID) {
-            fail_with_ctx!(
-                "HAYABUSA_DISPATCH_INCORRECT_PROGRAM_ID",
+            error_msg!(
+                "dispatch!: incorrect program id.",
                 ProgramError::IncorrectProgramId,
-                $program_id,
             );
         }
 
         const DISC_LEN: usize = 8;
 
         if unlikely($ix_data.len() < DISC_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_DISPATCH_IX_DATA_LEN",
+            error_msg!(
+                "dispatch!: instruction data too short",
                 ProgramError::InvalidInstructionData,
-                $ix_data,
             );
         }
 
@@ -46,10 +44,9 @@ macro_rules! dispatch {
                 }
             )+
             _ => {
-                fail_with_ctx!(
-                    "HAYABUSA_DISPATCH_UNKNOWN_IX",
+                error_msg!(
+                    "dispatch!: unknown instruction",
                     ErrorCode::UnknownInstruction,
-                    disc,
                 );
             }
         }

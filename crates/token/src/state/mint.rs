@@ -3,7 +3,7 @@
 
 use hayabusa_errors::Result;
 use hayabusa_ser::{Deserialize, FromBytesUnchecked, RawZcDeserialize, Zc};
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{
     account_info::{AccountInfo, Ref},
     hint::unlikely,
@@ -46,22 +46,18 @@ impl Deserialize for Mint {}
 /// Account data length is validated, and the Mint struct is properly aligned
 /// so it is safe to cast from raw ptr.
 unsafe impl RawZcDeserialize for Mint {
-    fn try_deserialize_raw<'ix>(account_info: &'ix AccountInfo) -> Result<Ref<'ix, Self>> {
+    fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<Self>> {
         if unlikely(account_info.data_len() != Self::LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_MINT_DATA_TOO_SHORT",
+            error_msg!(
+                "Mint::try_deserialize_raw: data length mismatch",
                 ProgramError::InvalidAccountData,
-                account_info.key(),
-                &u32::to_le_bytes(account_info.data_len() as u32),
             );
         }
 
         if unlikely(!account_info.is_owned_by(&crate::ID)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_MINT_INVALID_ACCOUNT_OWNER",
+            error_msg!(
+                "Mint::try_deserialize_raw: invalid owner",
                 ProgramError::InvalidAccountOwner,
-                account_info.key(),
-                account_info.owner(),
             );
         }
 

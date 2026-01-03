@@ -46,7 +46,7 @@ fn update_counter<'ix>(ctx: Ctx<'ix, UpdateCounter<'ix>>, amount: u64) -> Result
 
 pub struct UpdateCounter<'ix> {
     pub user: Signer<'ix>,
-    pub counter: Mut<'ix, ZcAccount<'ix, CounterAccount>>,
+    pub counter: Mut<ZcAccount<'ix, CounterAccount>>,
 }
 
 // Intentionally kept manual, you get to see what the FromAccountInfos proc macro is doing
@@ -83,8 +83,8 @@ fn initialize_counter<'ix>(ctx: Ctx<'ix, InitializeCounter<'ix>>) -> Result<()> 
 
 #[derive(FromAccountInfos)]
 pub struct InitializeCounter<'ix> {
-    pub user: Mut<'ix, Signer<'ix>>,
-    pub counter: Mut<'ix, ZcAccount<'ix, CounterAccount>>,
+    pub user: Mut<Signer<'ix>>,
+    pub counter: Mut<ZcAccount<'ix, CounterAccount>>,
     pub system_program: Program<'ix, System>,
 }
 

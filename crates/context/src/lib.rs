@@ -4,8 +4,9 @@
 #![no_std]
 
 use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{account_info::AccountInfo, hint::unlikely};
+use pinocchio_log::log;
 
 pub trait FromAccountInfos<'ix>
 where
@@ -76,8 +77,8 @@ impl<'ix> AccountIter<'ix> {
     #[inline(always)]
     pub fn next(&mut self) -> Result<&'ix AccountInfo> {
         if unlikely(self.index >= self.slice.len()) {
-            fail_with_ctx!(
-                "HAYABUSA_ACCOUNT_ITER_NEXT_NOT_PRESENT",
+            error_msg!(
+                "AccountIter::next: no accounts remaining.",
                 ErrorCode::InvalidAccount,
             );
         }

@@ -11,5 +11,6 @@ description = "Hayabusa CPI utils"
 [dependencies]
 pinocchio.workspace = true
 pinocchio-pubkey.workspace = true
+pinocchio-log.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true

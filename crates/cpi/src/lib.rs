@@ -4,7 +4,7 @@
 #![no_std]
 
 use hayabusa_errors::Result;
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{
     account_info::AccountInfo, hint::unlikely, instruction::Signer, program_error::ProgramError,
     pubkey::Pubkey,
@@ -16,11 +16,9 @@ pub trait CheckProgramId {
     #[inline(always)]
     fn check_program_id(id: &Pubkey) -> Result<()> {
         if unlikely(id != &Self::ID) {
-            fail_with_ctx!(
-                "HAYABUSA_CPI_INCORRECT_PROGRAM_ID",
+            error_msg!(
+                "check_program_id: incorrect program id.",
                 ProgramError::IncorrectProgramId,
-                id,
-                &Self::ID,
             );
         }
 
@@ -28,18 +26,18 @@ pub trait CheckProgramId {
     }
 }
 
-pub struct CpiCtx<'ix, 'b, 'c, 'd, T: CheckProgramId> {
+pub struct CpiCtx<'ix, 'a, 'b, 'c, T: CheckProgramId> {
     pub program_info: &'ix AccountInfo,
     pub accounts: T,
-    pub signers: Option<&'b [Signer<'c, 'd>]>,
+    pub signers: Option<&'a [Signer<'b, 'c>]>,
 }
 
-impl<'ix, 'b, 'c, 'd, T: CheckProgramId> CpiCtx<'ix, 'b, 'c, 'd, T> {
+impl<'ix, 'a, 'b, 'c, T: CheckProgramId> CpiCtx<'ix, 'a, 'b, 'c, T> {
     #[inline(always)]
     pub fn try_new(
         program_info: &'ix AccountInfo,
         accounts: T,
-        signers: Option<&'b [Signer<'c, 'd>]>,
+        signers: Option<&'a [Signer<'b, 'c>]>,
     ) -> Result<Self> {
         T::check_program_id(program_info.key())?;
 
@@ -65,7 +63,7 @@ impl<'ix, 'b, 'c, 'd, T: CheckProgramId> CpiCtx<'ix, 'b, 'c, 'd, T> {
     pub fn try_new_with_signer(
         program_info: &'ix AccountInfo,
         accounts: T,
-        signers: &'b [Signer<'c, 'd>],
+        signers: &'a [Signer<'b, 'c>],
     ) -> Result<Self> {
         T::check_program_id(program_info.key())?;
 

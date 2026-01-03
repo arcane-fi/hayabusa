@@ -24,23 +24,23 @@ where
 }
 
 #[allow(dead_code)]
-impl<'ix, T> ZcAccount<'ix, T>
+impl<T> ZcAccount<'_, T>
 where
     T: ZcDeserialize,
 {
     #[inline(always)]
-    pub fn try_deserialize(&self) -> Result<Ref<'ix, T>> {
+    pub fn try_deserialize(&self) -> Result<Ref<T>> {
         T::try_deserialize(self.account_info)
     }
 }
 
 #[allow(dead_code)]
-impl<'ix, T> ZcAccount<'ix, T>
+impl<T> ZcAccount<'_, T>
 where
     T: ZcDeserialize + ZcDeserializeMut,
 {
     #[inline(always)]
-    pub fn try_deserialize_mut(&self) -> Result<RefMut<'ix, T>> {
+    pub fn try_deserialize_mut(&self) -> Result<RefMut<T>> {
         T::try_deserialize_mut(self.account_info)
     }
 }
@@ -59,12 +59,12 @@ where
     }
 }
 
-impl<'ix, T> ZcAccount<'ix, T>
+impl<T> ZcAccount<'_, T>
 where
     T: RawZcDeserialize,
 {
     #[inline(always)]
-    pub fn try_deserialize_raw(&self) -> Result<Ref<'ix, T>> {
+    pub fn try_deserialize_raw(&self) -> Result<Ref<T>> {
         T::try_deserialize_raw(self.account_info)
     }
 }

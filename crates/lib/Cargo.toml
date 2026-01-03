@@ -14,6 +14,7 @@ std = ["pinocchio/std"]
 [dependencies]
 bytemuck.workspace = true
 pinocchio.workspace = true
+pinocchio-log.workspace = true
 pinocchio-pubkey.workspace = true
 hayabusa-cpi.workspace = true
 hayabusa-discriminator.workspace = true

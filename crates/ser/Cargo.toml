@@ -13,6 +13,7 @@ std = ["dep:borsh"]
 
 [dependencies]
 pinocchio.workspace = true
+pinocchio-log.workspace = true
 borsh = { workspace = true, optional = true }
 bytemuck.workspace = true
 hayabusa-discriminator.workspace = true

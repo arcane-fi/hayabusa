@@ -4,8 +4,9 @@
 use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
 use core::ops::Deref;
 use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::fail_with_ctx;
+use hayabusa_utility::error_msg;
 use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
+use pinocchio_log::log;
 
 pub struct Signer<'ix> {
     pub account_info: &'ix AccountInfo,
@@ -15,10 +16,9 @@ impl<'ix> FromAccountInfo<'ix> for Signer<'ix> {
     #[inline(always)]
     fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
         if unlikely(!account_info.is_signer()) {
-            fail_with_ctx!(
-                "HAYABUSA_SIGNER_ACCOUNT_NOT_SIGNER",
+            error_msg!(
+                "Signer::try_from_account_info: account is not a signer",
                 ErrorCode::AccountNotSigner,
-                account_info.key(),
             );
         }
 

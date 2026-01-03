@@ -2,16 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::{Deserialize, DeserializeMut, Zc};
-#[cfg(feature = "std")]
-use borsh::BorshDeserialize;
 use bytemuck::{AnyBitPattern, Pod};
 use hayabusa_cpi::CpiCtx;
 use hayabusa_discriminator::Discriminator;
-use hayabusa_errors::{ErrorCode, Result};
+use hayabusa_errors::Result;
 use hayabusa_system_program::instructions::{create_account, CreateAccount};
-use hayabusa_utility::{fail_with_ctx, Len, OwnerProgram};
-#[cfg(feature = "std")]
-use hayabusa_utility::{fail_with_ctx_no_return, program_error};
+use hayabusa_utility::{error_msg, Len, OwnerProgram};
 use pinocchio::{
     account_info::{AccountInfo, Ref, RefMut},
     hint::unlikely,
@@ -38,18 +34,16 @@ where
     #[inline(always)]
     fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<T>> {
         if unlikely(!account_info.is_owned_by(&T::OWNER)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_WRONG_OWNER",
+            error_msg!(
+                "try_deserialize_raw: wrong account owner",
                 ProgramError::InvalidAccountOwner,
-                account_info.key(),
             );
         }
 
         if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_WRONG_DATA_LEN",
+            error_msg!(
+                "try_deserialize_raw: wrong data length",
                 ProgramError::InvalidAccountData,
-                account_info.key(),
             );
         }
 
@@ -84,18 +78,16 @@ where
 {
     fn try_deserialize_raw_mut(account_info: &AccountInfo) -> Result<RefMut<Self>> {
         if unlikely(!account_info.is_owned_by(&T::OWNER)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_MUT_WRONG_OWNER",
+            error_msg!(
+                "try_deserialize_raw_mut: wrong account owner",
                 ProgramError::InvalidAccountOwner,
-                account_info.key(),
             );
         }
 
         if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_MUT_WRONG_DATA_LEN",
+            error_msg!(
+                "try_deserialize_raw_mut: wrong data length",
                 ProgramError::InvalidAccountData,
-                account_info.key(),
             );
         }
 
@@ -126,18 +118,16 @@ where
     #[inline(always)]
     unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
         if unlikely(!account_info.is_owned_by(&T::OWNER)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_WRONG_OWNER",
+            error_msg!(
+                "try_deserialize_raw_unchecked: wrong account owner",
                 ProgramError::InvalidAccountOwner,
-                account_info.key(),
             );
         }
 
         if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_WRONG_DATA_LEN",
+            error_msg!(
+                "try_deserialize_raw_unchecked: wrong data length",
                 ProgramError::InvalidAccountData,
-                account_info.key(),
             );
         }
 
@@ -174,18 +164,16 @@ where
     #[inline(always)]
     unsafe fn try_deserialize_raw_unchecked_mut(account_info: &AccountInfo) -> Result<&mut Self> {
         if unlikely(!account_info.is_owned_by(&T::OWNER)) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_MUT_WRONG_OWNER",
+            error_msg!(
+                "try_deserialize_raw_unchecked_mut: wrong account owner",
                 ProgramError::InvalidAccountOwner,
-                account_info.key(),
             );
         }
 
         if unlikely(account_info.data_len() != T::DISCRIMINATED_LEN) {
-            fail_with_ctx!(
-                "HAYABUSA_SER_RAW_UNCHECKED_MUT_WRONG_DATA_LEN",
+            error_msg!(
+                "try_deserialize_raw_unchecked_mut: wrong data length",
                 ProgramError::InvalidAccountData,
-                account_info.key(),
             );
         }
 
@@ -248,34 +236,27 @@ where
     T: AnyBitPattern + Discriminator + Len + OwnerProgram,
 {
     if unlikely(&T::OWNER != account_info.owner()) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_WRONG_ACCOUNT_OWNER",
+        error_msg!(
+            "try_deserialize_zc: wrong account owner",
             ProgramError::InvalidAccountOwner,
-            account_info.key(),
-            &T::OWNER,
-            account_info.owner(),
         );
     }
 
     let data = account_info.try_borrow_data()?;
 
     if unlikely(data.len() != T::DISCRIMINATED_LEN) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_ACCOUNT_DATA_TOO_SHORT",
-            ErrorCode::InvalidAccount,
-            account_info.key(),
+        error_msg!(
+            "try_deserialize_zc: wrong data length",
+            ProgramError::InvalidAccountData,
         );
     }
 
     let disc_bytes = &data[..8];
 
     if unlikely(disc_bytes != T::DISCRIMINATOR) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_INVALID_DISCRIMINATOR",
-            ErrorCode::InvalidAccountDiscriminator,
-            account_info.key(),
-            disc_bytes,
-            &T::DISCRIMINATOR,
+        error_msg!(
+            "try_deserialize_zc: invalid discriminator",
+            ProgramError::InvalidAccountData,
         );
     }
 
@@ -290,34 +271,27 @@ where
     T: Pod + Discriminator + Len + OwnerProgram,
 {
     if unlikely(&T::OWNER != account_info.owner()) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_MUT_INVALID_OWNER",
+        error_msg!(
+            "try_deserialize_zc_mut: wrong account owner",
             ProgramError::InvalidAccountOwner,
-            account_info.key(),
-            &T::OWNER,
-            account_info.owner(),
         );
     }
 
     let data = account_info.try_borrow_mut_data()?;
 
     if unlikely(data.len() != T::DISCRIMINATED_LEN) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_MUT_ACCOUNT_DATA_TOO_SHORT",
+        error_msg!(
+            "try_deserialize_zc_mut: wrong data length",
             ProgramError::InvalidAccountData,
-            account_info.key(),
         );
     }
 
     let disc_bytes = &data[..8];
 
     if unlikely(disc_bytes != T::DISCRIMINATOR) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_MUT_INVALID_DISCRIMINATOR",
-            ErrorCode::InvalidAccountDiscriminator,
-            account_info.key(),
-            disc_bytes,
-            &T::DISCRIMINATOR,
+        error_msg!(
+            "try_deserialize_zc_mut: invalid discriminator",
+            ProgramError::InvalidAccountData,
         );
     }
 
@@ -385,48 +359,4 @@ where
     Ok(RefMut::map(data, |d| {
         bytemuck::from_bytes_mut(&mut d[8..T::DISCRIMINATED_LEN])
     }))
-}
-
-#[cfg(feature = "std")]
-pub fn try_deserialize_borsh<T>(account_info: &AccountInfo) -> Result<T>
-where
-    T: BorshDeserialize + Discriminator + Len + OwnerProgram,
-{
-    if unlikely(&T::OWNER != account_info.owner()) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_BORSH_INVALID_OWNER",
-            ProgramError::InvalidAccountOwner,
-            account_info.key(),
-            &T::OWNER,
-            account_info.owner(),
-        );
-    }
-
-    let data = account_info.try_borrow_data()?;
-
-    if unlikely(data.len() != T::DISCRIMINATED_LEN) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_BORSH_ACCOUNT_DATA_TOO_SHORT",
-            ProgramError::InvalidAccountData,
-            account_info.key(),
-        );
-    }
-
-    let disc_bytes = &data[..8];
-
-    if unlikely(disc_bytes != T::DISCRIMINATOR) {
-        fail_with_ctx!(
-            "HAYABUSA_SER_BORSH_INVALID_DISCRIMINATOR",
-            ErrorCode::InvalidAccountDiscriminator,
-            account_info.key(),
-            disc_bytes,
-            &T::DISCRIMINATOR,
-        );
-    }
-
-    let content = &data[8..T::DISCRIMINATED_LEN];
-    T::try_from_slice(content).map_err(|_| {
-        fail_with_ctx_no_return!("HAYABUSA_SER_BORSH_DESERIALIZE_FAILED", account_info.key(),);
-        program_error!(ErrorCode::InvalidAccount)
-    })
 }
