@@ -60,6 +60,16 @@ where
     }
 }
 
+impl<'ix, T> core::ops::DerefMut for Ctx<'ix, T>
+where 
+    T: FromAccountInfos<'ix> + core::ops::Deref<Target = T>,
+{
+    #[inline(always)]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.accounts
+    }
+}
+
 #[derive(Clone)]
 pub struct AccountIter<'ix> {
     slice: &'ix [AccountInfo],
