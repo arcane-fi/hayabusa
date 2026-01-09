@@ -2842,6 +2842,8 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e37320fd2945c5d654b2c6210624a52d66c3f1f73b653ed211ab91a703b35bdd"
 dependencies = [
+ "bytemuck",
+ "bytemuck_derive",
  "five8",
  "five8_const 1.0.0",
  "solana-program-error 3.0.0",

@@ -37,6 +37,6 @@ hayabusa-entrypoint.workspace = true
 hayabusa-syscalls.workspace = true
 hayabusa-sysvars.workspace = true
 solana-account-view.workspace = true
-solana-address = { workspace = true, features = ["decode"] }
+solana-address = { workspace = true, features = ["decode", "bytemuck"] }
 solana-instruction-view = { workspace = true, features = ["cpi"] }
 solana-program-error.workspace = true
