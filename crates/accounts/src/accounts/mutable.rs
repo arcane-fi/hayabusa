@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{FromAccountView, WritableAllowed};
-use core::ops::Deref;
+use core::ops::{Deref, DerefMut};
 use hayabusa_errors::{ErrorCode, Result, ProgramError};
 use hayabusa_utility::{error_msg, hint::unlikely};
 use hayabusa_common::AccountView;
@@ -35,5 +35,15 @@ where
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl<'ix, T> DerefMut for Mut<T>
+where 
+    T: FromAccountView<'ix> + WritableAllowed + Deref<Target = T>,
+{
+    #[inline(always)]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
