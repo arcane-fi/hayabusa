@@ -1,25 +1,22 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use crate::{FromAccountView, ToAccountView, WritableAllowed};
 use core::ops::Deref;
 use hayabusa_errors::Result;
 use hayabusa_ser::{
     Deserialize, InitAccounts, RawZcDeserialize, RawZcDeserializeMut, RawZcDeserializeUnchecked,
     RawZcDeserializeUncheckedMut, Zc, ZcDeserialize, ZcDeserializeMut, ZcInitialize,
 };
-use pinocchio::{
-    account_info::{AccountInfo, Ref, RefMut},
-    instruction::Signer,
-    pubkey::Pubkey,
-};
+use hayabusa_common::{AccountView, Ref, RefMut};
+use solana_instruction_view::cpi::Signer;
 
 // ideally would put more concrete trait bound but ZcDeserialize and RawZcDeserialize are sometimes mutually exclusive
 pub struct ZcAccount<'ix, T>
 where
     T: Zc + Deserialize,
 {
-    pub account_info: &'ix AccountInfo,
+    pub account_view: &'ix AccountView,
     _phantom: core::marker::PhantomData<T>,
 }
 
@@ -30,7 +27,7 @@ where
 {
     #[inline(always)]
     pub fn try_deserialize(&self) -> Result<Ref<T>> {
-        T::try_deserialize(self.account_info)
+        T::try_deserialize(self.account_view)
     }
 }
 
@@ -41,7 +38,7 @@ where
 {
     #[inline(always)]
     pub fn try_deserialize_mut(&self) -> Result<RefMut<T>> {
-        T::try_deserialize_mut(self.account_info)
+        T::try_deserialize_mut(self.account_view)
     }
 }
 
@@ -55,7 +52,7 @@ where
         init_accounts: InitAccounts<'ix, '_>,
         signers: Option<&[Signer]>,
     ) -> Result<RefMut<'ix, T>> {
-        T::try_initialize(self.account_info, init_accounts, signers)
+        T::try_initialize(self.account_view, init_accounts, signers)
     }
 }
 
@@ -65,7 +62,7 @@ where
 {
     #[inline(always)]
     pub fn try_deserialize_raw(&self) -> Result<Ref<T>> {
-        T::try_deserialize_raw(self.account_info)
+        T::try_deserialize_raw(self.account_view)
     }
 }
 
@@ -75,7 +72,7 @@ where
 {
     #[inline(always)]
     pub fn try_deserialize_raw_mut(&self) -> Result<RefMut<T>> {
-        T::try_deserialize_raw_mut(self.account_info)
+        T::try_deserialize_raw_mut(self.account_view)
     }
 }
 
@@ -85,7 +82,7 @@ where
 {
     #[inline(always)]
     pub unsafe fn try_deserialize_raw_unchecked(&self) -> Result<&T> {
-        T::try_deserialize_raw_unchecked(self.account_info)
+        T::try_deserialize_raw_unchecked(self.account_view)
     }
 }
 
@@ -95,40 +92,30 @@ where
 {
     #[inline(always)]
     pub unsafe fn try_deserialize_raw_unchecked_mut(&self) -> Result<&mut T> {
-        T::try_deserialize_raw_unchecked_mut(self.account_info)
+        T::try_deserialize_raw_unchecked_mut(self.account_view)
     }
 }
 
-impl<'ix, T> FromAccountInfo<'ix> for ZcAccount<'ix, T>
+impl<'ix, T> FromAccountView<'ix> for ZcAccount<'ix, T>
 where
     T: Zc + Deserialize,
 {
     #[inline(always)]
-    fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
+    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
         Ok(ZcAccount {
-            account_info,
+            account_view,
             _phantom: core::marker::PhantomData,
         })
     }
 }
 
-impl<T> ToAccountInfo for ZcAccount<'_, T>
+impl<T> ToAccountView for ZcAccount<'_, T>
 where
     T: Zc + Deserialize,
 {
     #[inline(always)]
-    fn to_account_info(&self) -> &AccountInfo {
-        self.account_info
-    }
-}
-
-impl<T> Key for ZcAccount<'_, T>
-where
-    T: Zc + Deserialize,
-{
-    #[inline(always)]
-    fn key(&self) -> &Pubkey {
-        self.account_info.key()
+    fn to_account_view(&self) -> &AccountView {
+        self.account_view
     }
 }
 
@@ -138,10 +125,10 @@ impl<T> Deref for ZcAccount<'_, T>
 where
     T: Zc + Deserialize,
 {
-    type Target = AccountInfo;
+    type Target = AccountView;
 
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
-        &self.account_info
+        &self.account_view
     }
 }

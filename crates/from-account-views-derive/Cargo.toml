@@ -1,12 +1,12 @@
 [package]
-name = "hayabusa-from-account-infos-derive"
+name = "hayabusa-from-account-views-derive"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
 rust-version.workspace = true
-description = "Hayabusa from account infos derive"
+description = "Hayabusa from account views derive"
 
 [lib]
 proc-macro = true

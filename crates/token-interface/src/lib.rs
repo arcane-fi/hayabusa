@@ -4,10 +4,10 @@
 #![no_std]
 
 use hayabusa_accounts::ProgramIds;
-use pinocchio::pubkey::Pubkey;
+use hayabusa_common::Address;
 
 pub struct TokenInterface;
 
 impl ProgramIds for TokenInterface {
-    const IDS: &'static [Pubkey] = &[hayabusa_token::ID, hayabusa_token2022::ID];
+    const IDS: &'static [Address] = &[hayabusa_token::ID, hayabusa_token2022::ID];
 }

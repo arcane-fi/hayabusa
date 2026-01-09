@@ -12,9 +12,9 @@ pub fn derive_owner_program(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl OwnerProgram for #name {
-            const OWNER: Pubkey = crate::ID;
+            const OWNER: Address = crate::ID;
 
-            fn owner() -> Pubkey {
+            fn owner() -> Address {
                 Self::OWNER
             }
         }

@@ -4,17 +4,17 @@
 #![no_std]
 
 use hayabusa_errors::Result;
-use hayabusa_utility::error_msg;
-use pinocchio::{
-    account_info::AccountInfo, hint::unlikely, instruction::Signer, program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use hayabusa_utility::{error_msg, hint::unlikely};
+use solana_account_view::AccountView;
+use solana_address::Address;
+use solana_instruction_view::cpi::Signer;
+use solana_program_error::ProgramError;
 
 pub trait CheckProgramId {
-    const ID: Pubkey;
+    const ID: Address;
 
     #[inline(always)]
-    fn check_program_id(id: &Pubkey) -> Result<()> {
+    fn check_program_id(id: &Address) -> Result<()> {
         if unlikely(id != &Self::ID) {
             error_msg!(
                 "check_program_id: incorrect program id.",
@@ -27,7 +27,7 @@ pub trait CheckProgramId {
 }
 
 pub struct CpiCtx<'ix, 'a, 'b, 'c, T: CheckProgramId> {
-    pub program_info: &'ix AccountInfo,
+    pub program: &'ix AccountView,
     pub accounts: T,
     pub signers: Option<&'a [Signer<'b, 'c>]>,
 }
@@ -35,25 +35,25 @@ pub struct CpiCtx<'ix, 'a, 'b, 'c, T: CheckProgramId> {
 impl<'ix, 'a, 'b, 'c, T: CheckProgramId> CpiCtx<'ix, 'a, 'b, 'c, T> {
     #[inline(always)]
     pub fn try_new(
-        program_info: &'ix AccountInfo,
+        program: &'ix AccountView,
         accounts: T,
         signers: Option<&'a [Signer<'b, 'c>]>,
     ) -> Result<Self> {
-        T::check_program_id(program_info.key())?;
+        T::check_program_id(program.address())?;
 
         Ok(Self {
-            program_info,
+            program,
             accounts,
             signers,
         })
     }
 
     #[inline(always)]
-    pub fn try_new_without_signer(program_info: &'ix AccountInfo, accounts: T) -> Result<Self> {
-        T::check_program_id(program_info.key())?;
+    pub fn try_new_without_signer(program: &'ix AccountView, accounts: T) -> Result<Self> {
+        T::check_program_id(program.address())?;
 
         Ok(Self {
-            program_info,
+            program,
             accounts,
             signers: None,
         })
@@ -61,14 +61,14 @@ impl<'ix, 'a, 'b, 'c, T: CheckProgramId> CpiCtx<'ix, 'a, 'b, 'c, T> {
 
     #[inline(always)]
     pub fn try_new_with_signer(
-        program_info: &'ix AccountInfo,
+        program: &'ix AccountView,
         accounts: T,
         signers: &'a [Signer<'b, 'c>],
     ) -> Result<Self> {
-        T::check_program_id(program_info.key())?;
+        T::check_program_id(program.address())?;
 
         Ok(Self {
-            program_info,
+            program,
             accounts,
             signers: Some(signers),
         })

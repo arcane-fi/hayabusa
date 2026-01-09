@@ -1,51 +1,44 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use crate::{FromAccountView, ToAccountView, WritableAllowed};
 use core::ops::Deref;
-use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::error_msg;
-use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
+use hayabusa_errors::{ErrorCode, Result, ProgramError};
+use hayabusa_utility::{error_msg, hint::unlikely};
+use hayabusa_common::AccountView;
 
 pub struct Signer<'ix> {
-    pub account_info: &'ix AccountInfo,
+    pub account_view: &'ix AccountView,
 }
 
-impl<'ix> FromAccountInfo<'ix> for Signer<'ix> {
+impl<'ix> FromAccountView<'ix> for Signer<'ix> {
     #[inline(always)]
-    fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
-        if unlikely(!account_info.is_signer()) {
+    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+        if unlikely(!account_view.is_signer()) {
             error_msg!(
-                "Signer::try_from_account_info: account is not a signer",
+                "Signer::try_from_account_view: account is not a signer",
                 ErrorCode::AccountNotSigner,
             );
         }
 
-        Ok(Self { account_info })
+        Ok(Self { account_view })
     }
 }
 
-impl ToAccountInfo for Signer<'_> {
+impl ToAccountView for Signer<'_> {
     #[inline(always)]
-    fn to_account_info(&self) -> &AccountInfo {
-        self.account_info
-    }
-}
-
-impl Key for Signer<'_> {
-    #[inline(always)]
-    fn key(&self) -> &Pubkey {
-        self.account_info.key()
+    fn to_account_view(&self) -> &AccountView {
+        self.account_view
     }
 }
 
 impl WritableAllowed for Signer<'_> {}
 
 impl Deref for Signer<'_> {
-    type Target = AccountInfo;
+    type Target = AccountView;
 
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
-        &self.account_info
+        &self.account_view
     }
 }

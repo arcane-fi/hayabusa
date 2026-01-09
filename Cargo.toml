@@ -15,13 +15,16 @@ description = "Hayabusa: lightweight Solana runtime library."
 [workspace.dependencies]
 borsh = { version = "1.5", features = ["derive"] }
 bytemuck = "1.21.0"
-pinocchio = "0.9.2"
-pinocchio-pubkey = "0.3"
 pinocchio-log = "0.5.1"
 sha2 = "0.10"
 quote = "1.0"
 proc-macro2 = "1.0"
 syn = "2.0"
+solana-address = "2.0"
+solana-account-view = "1.0"
+solana-instruction-view = "1.0"
+solana-program-error = "3.0"
+solana-define-syscall = "4.0"
 hayabusa-accounts = { version = "0.1.0", path = "crates/accounts" }
 hayabusa-account-attribute-macro = { version = "0.1.0", path = "crates/account-attribute-macro" }
 hayabusa-discriminator = { version = "0.1.0", path = "crates/discriminator" }
@@ -38,8 +41,12 @@ hayabusa-len-derive = { version = "0.1.0", path = "crates/len-derive" }
 hayabusa-owner-program-derive = { version = "0.1.0", path = "crates/owner-program-derive" }
 hayabusa-ser-derive = { version = "0.1.0", path = "crates/ser-derive" }
 hayabusa-cpi = { version = "0.1.0", path = "crates/cpi" }
-hayabusa-from-account-infos-derive = { version = "0.1.0", path = "crates/from-account-infos-derive" }
+hayabusa-from-account-views-derive = { version = "0.1.0", path = "crates/from-account-views-derive" }
 hayabusa-system-program = { version = "0.1.0", path = "crates/system-program" }
 hayabusa-token = { version = "0.1.0", path = "crates/token" }
 hayabusa-token2022 = { version = "0.1.0", path = "crates/token2022" }
 hayabusa-token-interface = { version = "0.1.0", path = "crates/token-interface" }
+hayabusa-entrypoint = { version = "0.1.0", path = "crates/entrypoint" }
+hayabusa-syscalls = { version = "0.1.0", path = "crates/syscalls" }
+hayabusa-sysvars = { version = "0.1.0", path = "crates/sysvars" }
+hayabusa-common = { version = "0.1.0", path = "crates/common" }

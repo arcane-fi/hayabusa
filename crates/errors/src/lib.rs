@@ -5,6 +5,6 @@
 
 mod error_code;
 pub use error_code::*;
-use pinocchio::program_error::ProgramError;
+pub use solana_program_error::ProgramError;
 
 pub type Result<T> = core::result::Result<T, ProgramError>;

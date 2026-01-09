@@ -302,8 +302,8 @@ mod entrypoint {
     nostd_panic_handler!();
 
     pub fn program_entrypoint(
-        program_id: &Pubkey,
-        accounts: &[AccountInfo],
+        program_id: &Address,
+        accounts: &[AccountView],
         instruction_data: &[u8],
     ) -> Result<()> {
         dispatch!(
@@ -330,12 +330,12 @@ pub struct UpdateCounter<'a> {
     pub counter: Mut<'a, ZcAccount<'a, CounterAccount>>,
 }
 
-// Intentionally kept manual, you get to see what the FromAccountInfos proc macro is doing
-impl<'a> FromAccountInfos<'a> for UpdateCounter<'a> {
+// Intentionally kept manual, you get to see what the FromAccountViews proc macro is doing
+impl<'a> FromAccountViews<'a> for UpdateCounter<'a> {
     #[inline(always)]
-    fn try_from_account_infos(account_infos: &mut AccountIter<'a>) -> Result<Self> {
-        let user = Signer::try_from_account_info(account_infos.next()?)?;
-        let counter = Mut::try_from_account_info(account_infos.next()?)?;
+    fn try_from_account_views(account_views: &mut AccountIter<'a>) -> Result<Self> {
+        let user = Signer::try_from_account_view(account_views.next()?)?;
+        let counter = Mut::try_from_account_view(account_views.next()?)?;
 
         Ok(UpdateCounter {
             user,
@@ -350,8 +350,8 @@ fn initialize_counter<'a>(ctx: Ctx<'a, InitializeCounter<'a>>) -> Result<()> {
     let _ = ctx.counter.try_initialize(
         InitAccounts::new(
             &crate::ID,
-            ctx.user.to_account_info(),
-            ctx.system_program.to_account_info(),
+            ctx.user.to_account_view(),
+            ctx.system_program.to_account_view(),
         ),
         None,
     )?;
@@ -359,7 +359,7 @@ fn initialize_counter<'a>(ctx: Ctx<'a, InitializeCounter<'a>>) -> Result<()> {
     Ok(())
 }
 
-#[derive(FromAccountInfos)]
+#[derive(FromAccountViews)]
 pub struct InitializeCounter<'a> {
     pub user: Mut<'a, Signer<'a>>,
     pub counter: Mut<'a, ZcAccount<'a, CounterAccount>>,
@@ -378,7 +378,7 @@ const TESTS_LIB_RS: &str = r#"#![allow(unused)]
 use hayabusa::prelude::Discriminator;
 use litesvm::LiteSVM;
 use solana_sdk::{
-    account::Account, instruction::{AccountMeta, Instruction}, pubkey::Pubkey, signature::Keypair, signer::Signer, system_program, transaction::Transaction, pubkey,
+    account::Account, instruction::{AccountMeta, Instruction}, pubkey::Address, signature::Keypair, signer::Signer, system_program, transaction::Transaction, pubkey,
 };
 use spl_token::{state::{Account as TokenAccount, Mint}, solana_program::program_pack::Pack};
 
@@ -398,7 +398,7 @@ fn integration() {
     svm.airdrop(&user, 1_000_000_000_000).unwrap();
 
     let counter_account_data = pack_zc_account(CounterAccount { counter: 0 });
-    let counter_account_pk = Pubkey::new_unique();
+    let counter_account_pk = Address::new_unique();
     let counter_account = Account {
         lamports: svm.minimum_balance_for_rent_exemption(counter_account_data.len()),
         data: counter_account_data,

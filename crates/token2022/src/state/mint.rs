@@ -1,20 +1,12 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
-// SPDX-License-Identifier: Apache-2.0
-
-use hayabusa_errors::Result;
+use hayabusa_errors::{ProgramError, Result};
 use hayabusa_ser::{
     Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc,
 };
-use hayabusa_utility::{error_msg, OwnerProgram};
-use pinocchio::{
-    account_info::{AccountInfo, Ref},
-    hint::unlikely,
-    program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use hayabusa_utility::{error_msg, OwnerProgram, hint::unlikely};
+use hayabusa_common::{AccountView, Address, Ref};
 
 /// Mint data.
 #[repr(C)]
@@ -26,7 +18,7 @@ pub struct Mint {
     /// be provided during mint creation. If no mint authority is present
     /// then the mint has a fixed supply and no further tokens may be
     /// minted.
-    mint_authority: Pubkey,
+    mint_authority: Address,
 
     /// Total supply of tokens.
     supply: [u8; 8],
@@ -41,11 +33,11 @@ pub struct Mint {
     freeze_authority_flag: [u8; 4],
 
     /// Optional authority to freeze token accounts.
-    freeze_authority: Pubkey,
+    freeze_authority: Address,
 }
 
 impl OwnerProgram for Mint {
-    const OWNER: Pubkey = crate::ID;
+    const OWNER: Address = crate::ID;
 }
 
 impl Zc for Mint {}
@@ -55,22 +47,22 @@ impl Deserialize for Mint {}
 /// Account data length is validated, and the Mint struct is properly aligned
 /// so it is safe to cast from raw ptr.
 unsafe impl RawZcDeserialize for Mint {
-    fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<Self>> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    fn try_deserialize_raw(account_view: &AccountView) -> Result<Ref<Self>> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "Mint::try_deserialize_raw: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&Self::OWNER)) {
+        if unlikely(!account_view.owned_by(&Self::OWNER)) {
             error_msg!(
                 "Mint::try_deserialize_raw: invalid owner",
                 ProgramError::InvalidAccountOwner,
             );
         }
 
-        Ok(Ref::map(account_info.try_borrow_data()?, |d| unsafe {
+        Ok(Ref::map(account_view.try_borrow()?, |d| unsafe {
             Self::from_bytes_unchecked(d)
         }))
     }
@@ -78,15 +70,15 @@ unsafe impl RawZcDeserialize for Mint {
 
 impl RawZcDeserializeUnchecked for Mint {
     #[inline(always)]
-    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    unsafe fn try_deserialize_raw_unchecked(account_view: &AccountView) -> Result<&Self> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "Mint::try_deserialize_raw_unchecked: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&Self::OWNER)) {
+        if unlikely(!account_view.owned_by(&Self::OWNER)) {
             error_msg!(
                 "Mint::try_deserialize_raw_unchecked: invalid owner",
                 ProgramError::InvalidAccountOwner,
@@ -94,7 +86,7 @@ impl RawZcDeserializeUnchecked for Mint {
         }
 
         Ok(Self::from_bytes_unchecked(
-            account_info.borrow_data_unchecked(),
+            account_view.borrow_unchecked(),
         ))
     }
 }
@@ -110,7 +102,7 @@ impl Mint {
         self.mint_authority_flag[0] == 1
     }
 
-    pub fn mint_authority(&self) -> Option<&Pubkey> {
+    pub fn mint_authority(&self) -> Option<&Address> {
         if self.has_mint_authority() {
             Some(self.mint_authority_unchecked())
         } else {
@@ -123,7 +115,7 @@ impl Mint {
     /// This method should be used when the caller knows that the mint will have a mint
     /// authority set since it skips the `Option` check.
     #[inline(always)]
-    pub fn mint_authority_unchecked(&self) -> &Pubkey {
+    pub fn mint_authority_unchecked(&self) -> &Address {
         &self.mint_authority
     }
 
@@ -144,7 +136,7 @@ impl Mint {
         self.freeze_authority_flag[0] == 1
     }
 
-    pub fn freeze_authority(&self) -> Option<&Pubkey> {
+    pub fn freeze_authority(&self) -> Option<&Address> {
         if self.has_freeze_authority() {
             Some(self.freeze_authority_unchecked())
         } else {
@@ -157,7 +149,7 @@ impl Mint {
     /// This method should be used when the caller knows that the mint will have a freeze
     /// authority set since it skips the `Option` check.
     #[inline(always)]
-    pub fn freeze_authority_unchecked(&self) -> &Pubkey {
+    pub fn freeze_authority_unchecked(&self) -> &Address {
         &self.freeze_authority
     }
 }

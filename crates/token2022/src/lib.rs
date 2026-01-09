@@ -6,13 +6,13 @@
 pub mod instructions;
 pub mod state;
 
-pinocchio_pubkey::declare_id!("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+hayabusa_common::declare_id!("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 
 use hayabusa_accounts::ProgramId;
-use pinocchio::pubkey::Pubkey;
+use hayabusa_common::Address;
 
 pub struct Token2022;
 
 impl ProgramId for Token2022 {
-    const ID: Pubkey = ID;
+    const ID: Address = ID;
 }

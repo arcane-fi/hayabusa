@@ -9,8 +9,8 @@ rust-version.workspace = true
 description = "Hayabusa context"
 
 [dependencies]
-pinocchio.workspace = true
 pinocchio-log.workspace = true
 hayabusa-accounts.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true
+hayabusa-common.workspace = true

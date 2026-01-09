@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use pinocchio::program_error::{ProgramError, ToStr};
+use solana_program_error::ProgramError;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ErrorCode {
@@ -12,6 +12,10 @@ pub enum ErrorCode {
     InvalidAccount,
     AccountNotWritable,
     InvalidProgram,
+    InvalidSeeds,
+    SyscallFailed,
+    SeedsTooLong,
+    TooManySeeds,
 }
 
 impl TryFrom<u32> for ErrorCode {
@@ -26,6 +30,10 @@ impl TryFrom<u32> for ErrorCode {
             106 => Ok(ErrorCode::InvalidAccount),
             107 => Ok(ErrorCode::AccountNotWritable),
             108 => Ok(ErrorCode::InvalidProgram),
+            109 => Ok(ErrorCode::InvalidSeeds),
+            110 => Ok(ErrorCode::SyscallFailed),
+            111 => Ok(ErrorCode::SeedsTooLong),
+            112 => Ok(ErrorCode::TooManySeeds),
             _ => Err(ProgramError::InvalidArgument),
         }
     }
@@ -34,22 +42,5 @@ impl TryFrom<u32> for ErrorCode {
 impl From<ErrorCode> for ProgramError {
     fn from(e: ErrorCode) -> Self {
         ProgramError::Custom(e as u32)
-    }
-}
-
-impl ToStr for ErrorCode {
-    fn to_str<E>(&self) -> &'static str
-    where
-        E: ToStr + TryFrom<u32> + 'static,
-    {
-        match self {
-            ErrorCode::UnknownInstruction => "Error: Unknown instruction",
-            ErrorCode::BufferFull => "Error: Buffer full",
-            ErrorCode::InvalidAccountDiscriminator => "Error: Invalid account discriminator",
-            ErrorCode::AccountNotSigner => "Error: Account is not a signer",
-            ErrorCode::InvalidAccount => "Error: Invalid account",
-            ErrorCode::AccountNotWritable => "Error: Account is not writable",
-            ErrorCode::InvalidProgram => "Error: Invalid program",
-        }
     }
 }

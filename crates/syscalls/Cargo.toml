@@ -1,0 +1,14 @@
+[package]
+name = "hayabusa-syscalls"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description.workspace = true
+
+[dependencies]
+solana-address.workspace = true
+hayabusa-errors.workspace = true
+solana-define-syscall.workspace = true

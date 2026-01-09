@@ -3,30 +3,27 @@
 
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{
-    account_info::AccountInfo,
-    cpi::{invoke, invoke_signed},
-    instruction::{AccountMeta, Instruction},
-    pubkey::Pubkey,
-};
+use solana_account_view::AccountView;
+use solana_address::Address;
+use solana_instruction_view::{InstructionAccount, InstructionView, cpi::{invoke, invoke_signed}};
 
 pub struct Transfer<'ix> {
     /// Funding account
-    pub from: &'ix AccountInfo,
+    pub from: &'ix AccountView,
     /// Recipient account
-    pub to: &'ix AccountInfo,
+    pub to: &'ix AccountView,
 }
 
 impl CheckProgramId for Transfer<'_> {
-    const ID: Pubkey = crate::ID;
+    const ID: Address = crate::ID;
 }
 
 #[inline]
 pub fn transfer<'ix>(cpi_ctx: CpiCtx<'ix, '_, '_, '_, Transfer<'ix>>, lamports: u64) -> Result<()> {
-    let infos = [cpi_ctx.from, cpi_ctx.to];
-    let metas = [
-        AccountMeta::writable_signer(cpi_ctx.from.key()),
-        AccountMeta::writable(cpi_ctx.to.key()),
+    let account_views = [cpi_ctx.from, cpi_ctx.to];
+    let instruction_accounts = [
+        InstructionAccount::writable_signer(cpi_ctx.from.address()),
+        InstructionAccount::writable(cpi_ctx.to.address()),
     ];
 
     // ix data
@@ -36,15 +33,15 @@ pub fn transfer<'ix>(cpi_ctx: CpiCtx<'ix, '_, '_, '_, Transfer<'ix>>, lamports: 
     ix_data[0] = 2;
     ix_data[4..12].copy_from_slice(&lamports.to_le_bytes());
 
-    let instruction = Instruction {
+    let instruction = InstructionView {
         program_id: &crate::ID,
-        accounts: &metas,
+        accounts: &instruction_accounts,
         data: &ix_data,
     };
 
     if let Some(signers) = cpi_ctx.signers {
-        invoke_signed(&instruction, &infos, signers)
+        invoke_signed(&instruction, &account_views, signers)
     } else {
-        invoke(&instruction, &infos)
+        invoke(&instruction, &account_views)
     }
 }

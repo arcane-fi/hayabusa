@@ -5,26 +5,22 @@ use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
 use hayabusa_utility::{write_uninit_bytes, UNINIT_BYTE};
-use pinocchio::{
-    account_info::AccountInfo,
-    cpi::{invoke, invoke_signed},
-    instruction::{AccountMeta, Instruction},
-    pubkey::Pubkey,
-};
+use hayabusa_common::{AccountView, Address};
+use solana_instruction_view::{InstructionAccount, InstructionView, cpi::{invoke, invoke_signed}};
 
 pub struct TransferChecked<'ix> {
     /// Sender account
-    pub from: &'ix AccountInfo,
+    pub from: &'ix AccountView,
     /// Mint account
-    pub mint: &'ix AccountInfo,
+    pub mint: &'ix AccountView,
     /// Recipient account
-    pub to: &'ix AccountInfo,
+    pub to: &'ix AccountView,
     /// Authority account
-    pub authority: &'ix AccountInfo,
+    pub authority: &'ix AccountView,
 }
 
 impl CheckProgramId for TransferChecked<'_> {
-    const ID: Pubkey = crate::ID;
+    const ID: Address = crate::ID;
 }
 
 const DISCRIMINATOR: [u8; 1] = [10];
@@ -35,13 +31,13 @@ pub fn transfer_checked<'ix>(
     amount: u64,
     decimals: u8,
 ) -> Result<()> {
-    let infos = [cpi_ctx.from, cpi_ctx.mint, cpi_ctx.to, cpi_ctx.authority];
+    let account_views = [cpi_ctx.from, cpi_ctx.mint, cpi_ctx.to, cpi_ctx.authority];
 
-    let metas = [
-        AccountMeta::writable(cpi_ctx.from.key()),
-        AccountMeta::readonly(cpi_ctx.mint.key()),
-        AccountMeta::writable(cpi_ctx.to.key()),
-        AccountMeta::readonly_signer(cpi_ctx.authority.key()),
+    let instruction_accounts = [
+        InstructionAccount::writable(cpi_ctx.from.address()),
+        InstructionAccount::readonly(cpi_ctx.mint.address()),
+        InstructionAccount::writable(cpi_ctx.to.address()),
+        InstructionAccount::readonly_signer(cpi_ctx.authority.address()),
     ];
 
     // ix data layout
@@ -54,15 +50,15 @@ pub fn transfer_checked<'ix>(
     write_uninit_bytes(&mut ix_data[1..9], &amount.to_le_bytes());
     write_uninit_bytes(&mut ix_data[9..], &[decimals]);
 
-    let instruction = Instruction {
+    let instruction_view = InstructionView {
         program_id: &crate::ID,
-        accounts: &metas,
+        accounts: &instruction_accounts,
         data: unsafe { from_raw_parts(ix_data.as_ptr() as _, 10) },
     };
 
     if let Some(signers) = cpi_ctx.signers {
-        invoke_signed(&instruction, &infos, signers)
+        invoke_signed(&instruction_view, &account_views, signers)
     } else {
-        invoke(&instruction, &infos)
+        invoke(&instruction_view, &account_views)
     }
 }

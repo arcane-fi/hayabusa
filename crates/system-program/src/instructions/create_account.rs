@@ -4,38 +4,35 @@
 use super::minimum_balance;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
-use pinocchio::{
-    account_info::AccountInfo,
-    cpi::{invoke, invoke_signed},
-    instruction::{AccountMeta, Instruction},
-    pubkey::Pubkey,
-};
+use solana_instruction_view::{InstructionAccount, InstructionView, cpi::{invoke, invoke_signed}};
+use solana_account_view::AccountView;
+use solana_address::Address;
 
 pub struct CreateAccount<'ix> {
     /// Funding account
-    pub from: &'ix AccountInfo,
+    pub from: &'ix AccountView,
     /// New account
-    pub to: &'ix AccountInfo,
+    pub to: &'ix AccountView,
 }
 
 impl CheckProgramId for CreateAccount<'_> {
-    const ID: Pubkey = crate::ID;
+    const ID: Address = crate::ID;
 }
 
 #[inline]
 pub fn create_account<'ix>(
     cpi_ctx: CpiCtx<'ix, '_, '_, '_, CreateAccount<'ix>>,
-    owner_program: &Pubkey,
+    owner_program: &Address,
     space: u64,
 ) -> Result<()> {
     let lamports = minimum_balance(space as usize)?;
 
-    let metas = [
-        AccountMeta::writable_signer(cpi_ctx.from.key()),
-        AccountMeta::writable_signer(cpi_ctx.to.key()),
+    let instruction_accounts = [
+        InstructionAccount::writable_signer(cpi_ctx.from.address()),
+        InstructionAccount::writable_signer(cpi_ctx.to.address()),
     ];
 
-    let infos = [cpi_ctx.from, cpi_ctx.to];
+    let account_views = [cpi_ctx.from, cpi_ctx.to];
 
     // ix data
     // - [0..4]: instruction discriminator, in this case it is zero
@@ -47,15 +44,15 @@ pub fn create_account<'ix>(
     ix_data[12..20].copy_from_slice(&space.to_le_bytes());
     ix_data[20..52].copy_from_slice(owner_program.as_ref());
 
-    let instruction = Instruction {
+    let instruction = InstructionView {
         program_id: &crate::ID,
-        accounts: &metas,
+        accounts: &instruction_accounts,
         data: &ix_data,
     };
 
     if let Some(signers) = cpi_ctx.signers {
-        invoke_signed(&instruction, &infos, signers)
+        invoke_signed(&instruction, &account_views, signers)
     } else {
-        invoke(&instruction, &infos)
+        invoke(&instruction, &account_views)
     }
 }

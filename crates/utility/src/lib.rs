@@ -8,7 +8,8 @@ pub mod macros;
 
 use core::mem::MaybeUninit;
 use hayabusa_errors::Result;
-use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
+use solana_address::Address;
+use solana_program_error::ProgramError;
 
 pub trait Len
 where
@@ -29,9 +30,9 @@ pub fn take_bytes(data: &[u8], n: usize) -> Result<(&[u8], &[u8])> {
 }
 
 pub trait OwnerProgram {
-    const OWNER: Pubkey;
+    const OWNER: Address;
 
-    fn owner() -> Pubkey {
+    fn owner() -> Address {
         Self::OWNER
     }
 }
@@ -48,5 +49,41 @@ pub fn write_uninit_bytes(destination: &mut [MaybeUninit<u8>], source: &[u8]) {
     // We respect both slice bounds with min()
     unsafe {
         core::ptr::copy_nonoverlapping(source.as_ptr(), destination.as_mut_ptr() as *mut u8, len);
+    }
+}
+
+/// Module with functions to provide hints to the compiler about how code
+/// should be optimized.
+pub mod hint {
+    /// A "dummy" function with a hint to the compiler that it is unlikely to be
+    /// called.
+    ///
+    /// This function is used as a hint to the compiler to optimize other code paths
+    /// instead of the one where the function is used.
+    #[cold]
+    pub const fn cold_path() {}
+
+    /// Return the given `bool` value with a hint to the compiler that `true` is the
+    /// likely case.
+    #[inline(always)]
+    pub const fn likely(b: bool) -> bool {
+        if b {
+            true
+        } else {
+            cold_path();
+            false
+        }
+    }
+
+    /// Return a given `bool` value with a hint to the compiler that `false` is the
+    /// likely case.
+    #[inline(always)]
+    pub const fn unlikely(b: bool) -> bool {
+        if b {
+            cold_path();
+            true
+        } else {
+            false
+        }
     }
 }

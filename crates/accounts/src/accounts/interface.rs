@@ -1,57 +1,47 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, Key, ProgramIds, ToAccountInfo};
+use crate::{FromAccountView, ProgramIds, ToAccountView};
 use core::ops::Deref;
-use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::error_msg;
-use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
+use hayabusa_errors::{ErrorCode, Result, ProgramError};
+use hayabusa_utility::{error_msg, hint::unlikely};
+use hayabusa_common::AccountView;
 
 pub struct Interface<'ix, T>
 where
     T: ProgramIds,
 {
-    pub account_info: &'ix AccountInfo,
+    pub account_view: &'ix AccountView,
     _phantom: core::marker::PhantomData<T>,
 }
 
-impl<'ix, T> FromAccountInfo<'ix> for Interface<'ix, T>
+impl<'ix, T> FromAccountView<'ix> for Interface<'ix, T>
 where
     T: ProgramIds,
 {
     #[inline(always)]
-    fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
-        if unlikely(!T::IDS.contains(account_info.key())) {
+    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+        if unlikely(!T::IDS.contains(account_view.address())) {
             error_msg!(
-                "Interface::try_from_account_info: program ID mismatch",
+                "Interface::try_from_account_view: program ID mismatch",
                 ErrorCode::InvalidProgram,
             );
         }
 
         Ok(Interface {
-            account_info,
+            account_view,
             _phantom: core::marker::PhantomData,
         })
     }
 }
 
-impl<T> ToAccountInfo for Interface<'_, T>
+impl<T> ToAccountView for Interface<'_, T>
 where
     T: ProgramIds,
 {
     #[inline(always)]
-    fn to_account_info(&self) -> &AccountInfo {
-        self.account_info
-    }
-}
-
-impl<T> Key for Interface<'_, T>
-where
-    T: ProgramIds,
-{
-    #[inline(always)]
-    fn key(&self) -> &Pubkey {
-        self.account_info.key()
+    fn to_account_view(&self) -> &AccountView {
+        self.account_view
     }
 }
 
@@ -59,10 +49,10 @@ impl<T> Deref for Interface<'_, T>
 where
     T: ProgramIds,
 {
-    type Target = AccountInfo;
+    type Target = AccountView;
 
     #[inline(always)]
     fn deref(&self) -> &Self::Target {
-        &self.account_info
+        &self.account_view
     }
 }

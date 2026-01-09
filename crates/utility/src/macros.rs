@@ -23,7 +23,7 @@ macro_rules! error {
 #[macro_export]
 macro_rules! program_error {
     ($code:expr) => {
-        pinocchio::program_error::ProgramError::from($code)
+        ProgramError::from($code)
     };
 }
 

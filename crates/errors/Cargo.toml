@@ -9,4 +9,4 @@ rust-version.workspace = true
 description = "Hayabusa errors"
 
 [dependencies]
-pinocchio.workspace = true
+solana-program-error.workspace = true

@@ -1,54 +1,34 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FromAccountInfo, Key, ToAccountInfo, WritableAllowed};
+use crate::{FromAccountView, WritableAllowed};
 use core::ops::Deref;
-use hayabusa_errors::{ErrorCode, Result};
-use hayabusa_utility::error_msg;
-use pinocchio::{account_info::AccountInfo, hint::unlikely, pubkey::Pubkey};
+use hayabusa_errors::{ErrorCode, Result, ProgramError};
+use hayabusa_utility::{error_msg, hint::unlikely};
+use hayabusa_common::AccountView;
 
 pub struct Mut<T>(pub T);
 
-impl<'ix, T> FromAccountInfo<'ix> for Mut<T>
+impl<'ix, T> FromAccountView<'ix> for Mut<T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
+    T: FromAccountView<'ix> + WritableAllowed,
 {
     #[inline(always)]
-    fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self> {
-        if unlikely(!account_info.is_writable()) {
+    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+        if unlikely(!account_view.is_writable()) {
             error_msg!(
-                "Mut::try_from_account_info: account not writable",
+                "Mut::try_from_account_view: account not writable",
                 ErrorCode::AccountNotWritable,
             );
         }
 
-        Ok(Mut(T::try_from_account_info(account_info)?))
-    }
-}
-
-impl<'ix, T> ToAccountInfo for Mut<T>
-where
-    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
-{
-    #[inline(always)]
-    fn to_account_info(&self) -> &AccountInfo {
-        self.0.to_account_info()
-    }
-}
-
-impl<'ix, T> Key for Mut<T>
-where
-    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
-{
-    #[inline(always)]
-    fn key(&self) -> &Pubkey {
-        self.0.key()
+        Ok(Mut(T::try_from_account_view(account_view)?))
     }
 }
 
 impl<'ix, T> Deref for Mut<T>
 where
-    T: FromAccountInfo<'ix> + ToAccountInfo + Key + WritableAllowed,
+    T: FromAccountView<'ix> + WritableAllowed,
 {
     type Target = T;
 

@@ -5,24 +5,20 @@ use core::slice::from_raw_parts;
 use hayabusa_cpi::{CheckProgramId, CpiCtx};
 use hayabusa_errors::Result;
 use hayabusa_utility::{write_uninit_bytes, UNINIT_BYTE};
-use pinocchio::{
-    account_info::AccountInfo,
-    cpi::{invoke, invoke_signed},
-    instruction::{AccountMeta, Instruction},
-    pubkey::Pubkey,
-};
+use hayabusa_common::{AccountView, Address};
+use solana_instruction_view::{InstructionAccount, InstructionView, cpi::{invoke, invoke_signed}};
 
 pub struct MintToChecked<'ix> {
     /// Mint account
-    pub mint: &'ix AccountInfo,
+    pub mint: &'ix AccountView,
     /// Destination account
-    pub destination: &'ix AccountInfo,
+    pub destination: &'ix AccountView,
     /// Mint authority account
-    pub authority: &'ix AccountInfo,
+    pub authority: &'ix AccountView,
 }
 
 impl CheckProgramId for MintToChecked<'_> {
-    const ID: Pubkey = crate::ID;
+    const ID: Address = crate::ID;
 }
 
 const DISCRIMINATOR: [u8; 1] = [14];
@@ -33,12 +29,12 @@ pub fn mint_to_checked<'ix>(
     amount: u64,
     decimals: u8,
 ) -> Result<()> {
-    let infos = [cpi_ctx.mint, cpi_ctx.destination, cpi_ctx.authority];
+    let account_views = [cpi_ctx.mint, cpi_ctx.destination, cpi_ctx.authority];
 
-    let metas = [
-        AccountMeta::writable(cpi_ctx.mint.key()),
-        AccountMeta::writable(cpi_ctx.destination.key()),
-        AccountMeta::readonly_signer(cpi_ctx.authority.key()),
+    let instruction_accounts = [
+        InstructionAccount::writable(cpi_ctx.mint.address()),
+        InstructionAccount::writable(cpi_ctx.destination.address()),
+        InstructionAccount::readonly_signer(cpi_ctx.authority.address()),
     ];
 
     // ix data layout
@@ -51,15 +47,15 @@ pub fn mint_to_checked<'ix>(
     write_uninit_bytes(&mut ix_data[1..9], &amount.to_le_bytes());
     write_uninit_bytes(&mut ix_data[9..], &[decimals]);
 
-    let ix = Instruction {
+    let instruction_view = InstructionView {
         program_id: &crate::ID,
-        accounts: &metas,
+        accounts: &instruction_accounts,
         data: unsafe { from_raw_parts(ix_data.as_ptr() as _, 10) },
     };
 
     if let Some(signers) = cpi_ctx.signers {
-        invoke_signed(&ix, &infos, signers)
+        invoke_signed(&instruction_view, &account_views, signers)
     } else {
-        invoke(&ix, &infos)
+        invoke(&instruction_view, &account_views)
     }
 }

@@ -9,8 +9,10 @@ rust-version.workspace = true
 description = "Hayabusa CPI utils"
 
 [dependencies]
-pinocchio.workspace = true
-pinocchio-pubkey.workspace = true
+solana-account-view.workspace = true
+solana-address.workspace = true
+solana-instruction-view = { workspace = true, features = ["cpi"] }
+solana-program-error.workspace = true
 pinocchio-log.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true

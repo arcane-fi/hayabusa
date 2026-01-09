@@ -9,6 +9,10 @@ rust-version.workspace = true
 description = "Hayabusa Solana sysvars interface"
 
 [dependencies]
-pinocchio.workspace = true
+solana-account-view.workspace = true
+solana-address.workspace = true
+solana-instruction-view.workspace = true
+solana-program-error.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true
+hayabusa-syscalls.workspace = true

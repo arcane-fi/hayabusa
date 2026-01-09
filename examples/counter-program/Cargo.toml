@@ -10,7 +10,7 @@ version = "0.1.0"
 name = "counter-program"
 
 [workspace.dependencies]
-hayabusa = { path = "../../crates/lib" }
+hayabusa = { path = "../../crates/lib", features = ["alloc"] }
 hayabusa-token = { path = "../../crates/token" }
 bytemuck = { version = "1.21.0", features = ["derive"] }
 counter-program = { path = "programs/counter-program" }

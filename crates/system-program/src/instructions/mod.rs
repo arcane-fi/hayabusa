@@ -12,10 +12,10 @@ pub use create_account::*;
 pub use transfer::*;
 
 use hayabusa_errors::Result;
-use pinocchio::sysvars::{rent::Rent, Sysvar};
+use hayabusa_sysvars::{Sysvar, rent::Rent};
 
 fn minimum_balance(space: usize) -> Result<u64> {
     let rent = Rent::get()?;
 
-    Ok(rent.minimum_balance(space))
+    Ok(rent.try_minimum_balance(space)?)
 }

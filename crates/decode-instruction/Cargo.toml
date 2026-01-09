@@ -10,5 +10,5 @@ description.workspace = true
 
 [dependencies]
 hayabusa-errors.workspace = true
-pinocchio.workspace = true
 bytemuck.workspace = true
+solana-program-error.workspace = true

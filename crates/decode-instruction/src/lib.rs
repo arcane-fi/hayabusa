@@ -5,7 +5,7 @@
 
 use bytemuck::Pod;
 use hayabusa_errors::Result;
-use pinocchio::program_error::ProgramError;
+use solana_program_error::ProgramError;
 
 pub trait DecodeIx<'ix> {
     type Target;

@@ -9,13 +9,12 @@ rust-version.workspace = true
 description.workspace = true
 
 [features]
-std = ["pinocchio/std"]
+alloc = ["hayabusa-entrypoint/alloc"]
+std = []
 
 [dependencies]
 bytemuck.workspace = true
-pinocchio.workspace = true
 pinocchio-log.workspace = true
-pinocchio-pubkey.workspace = true
 hayabusa-cpi.workspace = true
 hayabusa-discriminator.workspace = true
 hayabusa-discriminator-derive.workspace = true
@@ -32,5 +31,12 @@ hayabusa-len-derive.workspace = true
 hayabusa-owner-program-derive.workspace = true
 hayabusa-ser-derive.workspace = true
 hayabusa-system-program.workspace = true
-hayabusa-from-account-infos-derive.workspace = true
+hayabusa-from-account-views-derive.workspace = true
 hayabusa-account-attribute-macro.workspace = true
+hayabusa-entrypoint.workspace = true
+hayabusa-syscalls.workspace = true
+hayabusa-sysvars.workspace = true
+solana-account-view.workspace = true
+solana-address = { workspace = true, features = ["decode"] }
+solana-instruction-view = { workspace = true, features = ["cpi"] }
+solana-program-error.workspace = true

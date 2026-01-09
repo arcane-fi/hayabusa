@@ -9,6 +9,7 @@ rust-version.workspace = true
 description = "Hayabusa utilities"
 
 [dependencies]
-pinocchio.workspace = true
+solana-program-error.workspace = true
+solana-address.workspace = true
 pinocchio-log.workspace = true
 hayabusa-errors.workspace = true

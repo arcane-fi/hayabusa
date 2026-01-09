@@ -2,26 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use super::AccountState;
-use hayabusa_errors::Result;
+use hayabusa_errors::{Result, ProgramError};
 use hayabusa_ser::{
     Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc,
 };
-use hayabusa_utility::error_msg;
-use pinocchio::{
-    account_info::{AccountInfo, Ref},
-    hint::unlikely,
-    program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use hayabusa_utility::{error_msg, hint::unlikely};
+use hayabusa_common::{AccountView, Address, Ref};
 
 /// Token account data.
 #[repr(C)]
 pub struct TokenAccount {
     /// The mint associated with this account
-    mint: Pubkey,
+    mint: Address,
 
     /// The owner of this account.
-    owner: Pubkey,
+    owner: Address,
 
     /// The amount of tokens this account holds.
     amount: [u8; 8],
@@ -31,7 +26,7 @@ pub struct TokenAccount {
 
     /// If `delegate` is `Some` then `delegated_amount` represents
     /// the amount authorized by the delegate.
-    delegate: Pubkey,
+    delegate: Address,
 
     /// The account's state.
     state: u8,
@@ -52,7 +47,7 @@ pub struct TokenAccount {
     close_authority_flag: [u8; 4],
 
     /// Optional authority to close the account.
-    close_authority: Pubkey,
+    close_authority: Address,
 }
 
 impl FromBytesUnchecked for TokenAccount {}
@@ -61,22 +56,22 @@ impl Deserialize for TokenAccount {}
 
 unsafe impl RawZcDeserialize for TokenAccount {
     #[inline]
-    fn try_deserialize_raw(account_info: &AccountInfo) -> Result<Ref<Self>> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    fn try_deserialize_raw(account_view: &AccountView) -> Result<Ref<Self>> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "TokenAccount::try_deserialize_raw: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&crate::ID)) {
+        if unlikely(!account_view.owned_by(&crate::ID)) {
             error_msg!(
                 "TokenAccount::try_deserialize_raw: invalid owner",
                 ProgramError::InvalidAccountOwner,
             );
         }
 
-        Ok(Ref::map(account_info.try_borrow_data()?, |d| unsafe {
+        Ok(Ref::map(account_view.try_borrow()?, |d| unsafe {
             Self::from_bytes_unchecked(d)
         }))
     }
@@ -84,15 +79,15 @@ unsafe impl RawZcDeserialize for TokenAccount {
 
 impl RawZcDeserializeUnchecked for TokenAccount {
     #[inline(always)]
-    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    unsafe fn try_deserialize_raw_unchecked(account_view: &AccountView) -> Result<&Self> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "TokenAccount::try_deserialize_raw_unchecked: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&crate::ID)) {
+        if unlikely(!account_view.owned_by(&crate::ID)) {
             error_msg!(
                 "TokenAccount::try_deserialize_raw_unchecked: invalid owner",
                 ProgramError::InvalidAccountOwner,
@@ -100,7 +95,7 @@ impl RawZcDeserializeUnchecked for TokenAccount {
         }
 
         Ok(Self::from_bytes_unchecked(
-            account_info.borrow_data_unchecked(),
+            account_view.borrow_unchecked(),
         ))
     }
 }
@@ -108,11 +103,11 @@ impl RawZcDeserializeUnchecked for TokenAccount {
 impl TokenAccount {
     pub const LEN: usize = core::mem::size_of::<TokenAccount>();
 
-    pub fn mint(&self) -> &Pubkey {
+    pub fn mint(&self) -> &Address {
         &self.mint
     }
 
-    pub fn owner(&self) -> &Pubkey {
+    pub fn owner(&self) -> &Address {
         &self.owner
     }
 
@@ -125,7 +120,7 @@ impl TokenAccount {
         self.delegate_flag[0] == 1
     }
 
-    pub fn delegate(&self) -> Option<&Pubkey> {
+    pub fn delegate(&self) -> Option<&Address> {
         if self.has_delegate() {
             Some(self.delegate_unchecked())
         } else {
@@ -135,7 +130,7 @@ impl TokenAccount {
 
     /// Use this when you know the account will have a delegate and want to skip the `Option` check.
     #[inline(always)]
-    pub fn delegate_unchecked(&self) -> &Pubkey {
+    pub fn delegate_unchecked(&self) -> &Address {
         &self.delegate
     }
 
@@ -175,7 +170,7 @@ impl TokenAccount {
         self.close_authority_flag[0] == 1
     }
 
-    pub fn close_authority(&self) -> Option<&Pubkey> {
+    pub fn close_authority(&self) -> Option<&Address> {
         if self.has_close_authority() {
             Some(self.close_authority_unchecked())
         } else {
@@ -188,7 +183,7 @@ impl TokenAccount {
     /// This method should be used when the caller knows that the token will have a close
     /// authority set since it skips the `Option` check.
     #[inline(always)]
-    pub fn close_authority_unchecked(&self) -> &Pubkey {
+    pub fn close_authority_unchecked(&self) -> &Address {
         &self.close_authority
     }
 

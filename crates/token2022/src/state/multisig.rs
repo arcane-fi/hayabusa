@@ -1,17 +1,12 @@
 // Copyright (c) 2025, Arcane Labs <dev@arcane.fi>
 // SPDX-License-Identifier: Apache-2.0
 
-use hayabusa_errors::Result;
+use hayabusa_errors::{Result, ProgramError};
 use hayabusa_ser::{
     Deserialize, FromBytesUnchecked, RawZcDeserialize, RawZcDeserializeUnchecked, Zc,
 };
-use hayabusa_utility::{error_msg, OwnerProgram};
-use pinocchio::{
-    account_info::{AccountInfo, Ref},
-    hint::unlikely,
-    program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use hayabusa_utility::{error_msg, OwnerProgram, hint::unlikely};
+use hayabusa_common::{AccountView, Address, Ref};
 
 pub const MAX_MULTISIG_SIGNERS: usize = 11;
 
@@ -25,33 +20,33 @@ pub struct Multisig {
     /// Is `true` if this structure has been initialized
     is_initialized: u8,
     /// Signer public keys
-    signers: [Pubkey; MAX_MULTISIG_SIGNERS],
+    signers: [Address; MAX_MULTISIG_SIGNERS],
 }
 
 impl OwnerProgram for Multisig {
-    const OWNER: Pubkey = crate::ID;
+    const OWNER: Address = crate::ID;
 }
 
 impl Zc for Multisig {}
 impl Deserialize for Multisig {}
 
 unsafe impl RawZcDeserialize for Multisig {
-    fn try_deserialize_raw(account_info: &AccountInfo) -> hayabusa_errors::Result<Ref<Self>> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    fn try_deserialize_raw(account_view: &AccountView) -> hayabusa_errors::Result<Ref<Self>> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "Multisig::try_deserialize_raw: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&Self::OWNER)) {
+        if unlikely(!account_view.owned_by(&Self::OWNER)) {
             error_msg!(
                 "Multisig::try_deserialize_raw: invalid owner",
                 ProgramError::InvalidAccountOwner,
             );
         }
 
-        Ok(Ref::map(account_info.try_borrow_data()?, |d| unsafe {
+        Ok(Ref::map(account_view.try_borrow()?, |d| unsafe {
             Self::from_bytes_unchecked(d)
         }))
     }
@@ -59,23 +54,23 @@ unsafe impl RawZcDeserialize for Multisig {
 
 impl RawZcDeserializeUnchecked for Multisig {
     #[inline(always)]
-    unsafe fn try_deserialize_raw_unchecked(account_info: &AccountInfo) -> Result<&Self> {
-        if unlikely(account_info.data_len() != Self::LEN) {
+    unsafe fn try_deserialize_raw_unchecked(account_view: &AccountView) -> Result<&Self> {
+        if unlikely(account_view.data_len() != Self::LEN) {
             error_msg!(
                 "Multisig::try_deserialize_raw_unchecked: data length mismatch",
                 ProgramError::InvalidAccountData,
             );
         }
 
-        if unlikely(!account_info.is_owned_by(&Self::OWNER)) {
+        if unlikely(!account_view.owned_by(&Self::OWNER)) {
             error_msg!(
-                "Multisig::try_deserialize_raw_unchecked_mut: invalid owner",
+                "Multisig::try_deserialize_raw_unchecked: invalid owner",
                 ProgramError::InvalidAccountOwner,
             );
         }
 
         Ok(Self::from_bytes_unchecked(
-            account_info.borrow_data_unchecked(),
+            account_view.borrow_unchecked(),
         ))
     }
 }
@@ -100,8 +95,8 @@ impl Multisig {
 
     /// Return the signer addresses of the `Multisig`.
     #[inline(always)]
-    pub fn signers(&self) -> &[Pubkey] {
-        // SAFETY: `self.signers` is an array of `Pubkey` with a fixed size of
+    pub fn signers(&self) -> &[Address] {
+        // SAFETY: `self.signers` is an array of `Address` with a fixed size of
         // `MAX_MULTISIG_SIGNERS`; `self.signers_len` is always `<= MAX_MULTISIG_SIGNERS`
         // and indicates how many of these signers are valid.
         unsafe { self.signers.get_unchecked(..self.signers_len()) }

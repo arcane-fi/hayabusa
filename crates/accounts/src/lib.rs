@@ -10,18 +10,14 @@ pub use accounts::{
 };
 
 use hayabusa_errors::Result;
-use pinocchio::{account_info::AccountInfo, pubkey::Pubkey};
+use hayabusa_common::{AccountView, Address};
 
-pub trait FromAccountInfo<'ix>: Sized {
-    fn try_from_account_info(account_info: &'ix AccountInfo) -> Result<Self>;
+pub trait FromAccountView<'ix>: Sized {
+    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self>;
 }
 
-pub trait Key {
-    fn key(&self) -> &Pubkey;
-}
-
-pub trait ToAccountInfo {
-    fn to_account_info(&self) -> &AccountInfo;
+pub trait ToAccountView {
+    fn to_account_view(&self) -> &AccountView;
 }
 
 pub trait AccountInitializer<'ix, 'b>
@@ -34,9 +30,9 @@ where
 pub trait WritableAllowed {}
 
 pub trait ProgramId {
-    const ID: Pubkey;
+    const ID: Address;
 }
 
 pub trait ProgramIds {
-    const IDS: &'static [Pubkey];
+    const IDS: &'static [Address];
 }

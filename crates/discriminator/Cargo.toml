@@ -9,7 +9,7 @@ rust-version.workspace = true
 description = "Hayabusa discriminator"
 
 [dependencies]
-pinocchio.workspace = true
+solana-account-view.workspace = true
 pinocchio-log.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true

@@ -9,11 +9,11 @@ rust-version.workspace = true
 description = "Hayabusa Token program interface"
 
 [dependencies]
-pinocchio.workspace = true
 pinocchio-log.workspace = true
-pinocchio-pubkey.workspace = true
 hayabusa-cpi.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-utility.workspace = true
 hayabusa-ser.workspace = true
 hayabusa-accounts.workspace = true
+hayabusa-common.workspace = true
+solana-instruction-view = { workspace = true, features = ["cpi"] }

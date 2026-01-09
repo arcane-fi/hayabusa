@@ -12,7 +12,6 @@ description = "Hayabusa serialization utils"
 std = ["dep:borsh"]
 
 [dependencies]
-pinocchio.workspace = true
 pinocchio-log.workspace = true
 borsh = { workspace = true, optional = true }
 bytemuck.workspace = true
@@ -21,3 +20,7 @@ hayabusa-utility.workspace = true
 hayabusa-errors.workspace = true
 hayabusa-cpi.workspace = true
 hayabusa-system-program.workspace = true
+solana-account-view.workspace = true
+solana-address.workspace = true
+solana-instruction-view = { workspace = true, features = ["cpi"] }
+solana-program-error.workspace = true
