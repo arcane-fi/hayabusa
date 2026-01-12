@@ -13,7 +13,13 @@ use hayabusa_common::{AccountView, Address};
 use hayabusa_errors::Result;
 
 pub trait FromAccountView<'ix>: Sized {
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self>;
+    type Meta<'a>
+    where
+        'ix: 'a;
+
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, meta: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a;
 }
 
 pub trait ToAccountView {

@@ -19,8 +19,15 @@ impl<'ix, T> FromAccountView<'ix> for Program<'ix, T>
 where
     T: ProgramId,
 {
+    type Meta<'a> = ()
+    where
+        'ix: 'a;
+
     #[inline(always)]
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, _: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a,
+    {
         if unlikely(!account_view.executable()) {
             error_msg!(
                 "Program::try_from_account_view: program account is not executable.",

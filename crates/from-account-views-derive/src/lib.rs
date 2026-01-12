@@ -1,36 +1,32 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, spanned::Spanned, Data, DeriveInput, Fields, Type, TypePath};
+use syn::{
+    parse_macro_input, spanned::Spanned, Data, DeriveInput, Fields, Ident, Type,
+    TypePath,
+};
 
-#[proc_macro_derive(FromAccountViews)]
+#[proc_macro_derive(FromAccountViews, attributes(args))]
 pub fn derive_from_account_views(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
     let struct_name = &input.ident;
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
 
-    let lifetimes: Vec<syn::Lifetime> = input
-        .generics
-        .lifetimes()
-        .map(|lt_def| lt_def.lifetime.clone())
-        .collect();
-
-    let info_lt = match lifetimes.as_slice() {
+    // ---- extract exactly one lifetime ('ix)
+    let info_lt = match input.generics.lifetimes().collect::<Vec<_>>().as_slice() {
+        [lt] => &lt.lifetime,
         [] => {
             return syn::Error::new(
                 input.span(),
-                "FromAccountViews can only be derived for structs with a lifetime parameter \
-                 (e.g. `struct Foo<'ix> { ... }`).",
+                "FromAccountViews requires exactly one lifetime parameter",
             )
             .to_compile_error()
             .into();
         }
-        [lt] => lt,
         _ => {
             return syn::Error::new(
                 input.span(),
-                "FromAccountViews derive currently supports structs with exactly one lifetime \
-                 parameter.",
+                "FromAccountViews supports exactly one lifetime parameter",
             )
             .to_compile_error()
             .into();
@@ -39,11 +35,11 @@ pub fn derive_from_account_views(input: TokenStream) -> TokenStream {
 
     let fields = match &input.data {
         Data::Struct(s) => match &s.fields {
-            Fields::Named(named) => &named.named,
+            Fields::Named(n) => &n.named,
             _ => {
                 return syn::Error::new(
                     s.fields.span(),
-                    "FromAccountViews can only be derived for structs with named fields",
+                    "FromAccountViews supports named fields only",
                 )
                 .to_compile_error()
                 .into();
@@ -59,37 +55,42 @@ pub fn derive_from_account_views(input: TokenStream) -> TokenStream {
         }
     };
 
-    // For each field:
-    // let field_name = OuterType::try_from_account_view(account_views.next()?)?;
-    let mut let_bindings = Vec::with_capacity(fields.len());
-    let mut field_idents = Vec::with_capacity(fields.len());
+    let mut bindings = Vec::new();
+    let mut field_idents = Vec::new();
 
-    for f in fields {
-        let ident = match &f.ident {
-            Some(i) => i,
-            None => continue,
-        };
+    for field in fields {
+        let ident = field.ident.as_ref().unwrap();
         field_idents.push(ident);
 
-        let outer = match outer_type_ident(&f.ty) {
+        let outer = match outer_type_ident(&field.ty) {
             Ok(o) => o,
             Err(e) => return e.to_compile_error().into(),
         };
 
-        let_bindings.push(quote! {
-            let #ident = #outer::try_from_account_view(account_views.next()?)?;
+        let meta_expr = match parse_args(&field.attrs, &outer, info_lt) {
+            Ok(m) => m,
+            Err(e) => return e.to_compile_error().into(),
+        };
+
+        bindings.push(quote! {
+            let #ident =
+                #outer::try_from_account_view(
+                    account_views.next()?,
+                    #meta_expr,
+                )?;
         });
     }
 
-    // Use struct literal like:
-    // Ok(StructName { a, b, c })
     let expanded = quote! {
-        impl #impl_generics FromAccountViews<#info_lt> for #struct_name #ty_generics #where_clause {
-            #[inline(always)]
-            fn try_from_account_views(account_views: &mut AccountIter<#info_lt>) -> Result<Self> {
-                #(#let_bindings)*
+        impl #impl_generics FromAccountViews<#info_lt>
+            for #struct_name #ty_generics #where_clause
+        {
+            fn try_from_account_views(
+                account_views: &mut AccountIter<#info_lt>
+            ) -> Result<Self> {
+                #(#bindings)*
 
-                Ok(#struct_name {
+                Ok(Self {
                     #(#field_idents,)*
                 })
             }
@@ -99,22 +100,36 @@ pub fn derive_from_account_views(input: TokenStream) -> TokenStream {
     expanded.into()
 }
 
-fn outer_type_ident(ty: &Type) -> Result<syn::Ident, syn::Error> {
-    // We expect something like Mut<'a, Signer<'a>> or Program<'a, System>, etc.
-    // Extract the first path segment ident (Mut, Program, ...).
-    let tp = match ty {
-        Type::Path(TypePath { path, .. }) => path,
-        other => {
-            return Err(syn::Error::new(
-                other.span(),
-                "Field type must be a path type like Mut<...> or Program<...>",
-            ));
-        }
-    };
 
-    let seg = tp.segments.first().ok_or_else(|| {
-        syn::Error::new(tp.span(), "Expected a non-empty type path for field type")
-    })?;
-
-    Ok(seg.ident.clone())
+fn outer_type_ident(ty: &Type) -> Result<Ident, syn::Error> {
+    match ty {
+        Type::Path(TypePath { path, .. }) => Ok(path.segments.first().unwrap().ident.clone()),
+        _ => Err(syn::Error::new(ty.span(), "expected path type")),
+    }
 }
+
+fn parse_args(
+    attrs: &[syn::Attribute],
+    outer: &Ident,
+    info_lt: &syn::Lifetime,
+) -> Result<proc_macro2::TokenStream, syn::Error> {
+    for attr in attrs {
+        if attr.path().is_ident("args") {
+            let args = attr.parse_args_with(
+                syn::punctuated::Punctuated::<syn::MetaNameValue, syn::Token![,]>::parse_terminated,
+            )?;
+
+            // Named args only; we pass VALUES in declaration order
+            let values = args.iter().map(|kv| &kv.value);
+
+            return Ok(quote! {
+                <#outer as FromAccountView<#info_lt>>::Meta::new(
+                    #(#values),*
+                )
+            });
+        }
+    }
+
+    Ok(quote! { () })
+}
+

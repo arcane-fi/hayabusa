@@ -12,8 +12,15 @@ pub struct SystemAccount<'ix> {
 }
 
 impl<'ix> FromAccountView<'ix> for SystemAccount<'ix> {
+    type Meta<'a> = ()
+    where
+        'ix: 'a;
+
     #[inline(always)]
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, _: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a,
+    {
         if unlikely(!account_view.owned_by(&hayabusa_system_program::ID)) {
             error_msg!(
                 "SystemAccount::try_from_account_view: invalid account owner, must be system program",

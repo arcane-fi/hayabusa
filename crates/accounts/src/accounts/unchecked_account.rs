@@ -10,8 +10,15 @@ pub struct UncheckedAccount<'ix> {
 }
 
 impl<'ix> FromAccountView<'ix> for UncheckedAccount<'ix> {
+    type Meta<'a> = ()
+    where
+        'ix: 'a;
+
     #[inline(always)]
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, _: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a,    
+    {
         Ok(UncheckedAccount { account_view })
     }
 }

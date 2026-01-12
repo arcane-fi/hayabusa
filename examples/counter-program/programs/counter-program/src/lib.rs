@@ -68,8 +68,8 @@ pub struct UpdateCounter<'ix> {
 impl<'ix> FromAccountViews<'ix> for UpdateCounter<'ix> {
     #[inline(always)]
     fn try_from_account_views(account_views: &mut AccountIter<'ix>) -> Result<Self> {
-        let user = Signer::try_from_account_view(account_views.next()?)?;
-        let counter = Mut::try_from_account_view(account_views.next()?)?;
+        let user = Signer::try_from_account_view(account_views.next()?, ())?;
+        let counter = Mut::try_from_account_view(account_views.next()?, ())?;
 
         Ok(UpdateCounter {
             user,
@@ -135,4 +135,47 @@ impl<'ix> FromAccountViews<'ix> for NoOp {
 #[derive(OwnerProgram)]
 pub struct CounterAccount {
     pub count: u64,
+}
+
+#[derive(FromAccountViews)]
+pub struct ArgsTest<'ix> {
+    pub user: Signer<'ix>,
+    #[args(addr = user.address())]
+    pub test: TestAccount<'ix>,
+
+}
+
+pub struct TestAccount<'ix> {
+    pub test: &'ix Test,
+}
+
+pub struct TestAccountMeta<'a> {
+    pub addr: &'a Address,
+}
+
+impl<'a> TestAccountMeta<'a> {
+    pub fn new(addr: &'a Address) -> Self {
+        Self { addr }
+    }
+}
+
+impl<'ix> FromAccountView<'ix> for TestAccount<'ix> {
+    type Meta<'a> = TestAccountMeta<'a>
+    where
+        'ix: 'a;
+    
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, _: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a 
+    {
+        Ok(TestAccount {
+            test: unsafe { Test::try_deserialize_raw_unchecked(account_view)? },
+        })
+    }
+}
+
+#[account]
+#[derive(OwnerProgram, FromBytesUnchecked)]
+pub struct Test {
+    pub value: u64,
 }

@@ -100,8 +100,15 @@ impl<'ix, T> FromAccountView<'ix> for ZcAccount<'ix, T>
 where
     T: Zc + Deserialize,
 {
+    type Meta<'a> = ()
+    where
+        'ix: 'a;
+
     #[inline(always)]
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, _: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a,
+    {
         Ok(ZcAccount {
             account_view,
             _phantom: core::marker::PhantomData,

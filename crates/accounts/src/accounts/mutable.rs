@@ -13,8 +13,15 @@ impl<'ix, T> FromAccountView<'ix> for Mut<T>
 where
     T: FromAccountView<'ix> + WritableAllowed,
 {
+    type Meta<'a> = T::Meta<'a>
+    where
+        'ix: 'a;
+
     #[inline(always)]
-    fn try_from_account_view(account_view: &'ix AccountView) -> Result<Self> {
+    fn try_from_account_view<'a>(account_view: &'ix AccountView, meta: Self::Meta<'a>) -> Result<Self>
+    where 
+        'ix: 'a,
+    {
         if unlikely(!account_view.is_writable()) {
             error_msg!(
                 "Mut::try_from_account_view: account not writable",
@@ -22,7 +29,7 @@ where
             );
         }
 
-        Ok(Mut(T::try_from_account_view(account_view)?))
+        Ok(Mut(T::try_from_account_view(account_view, meta)?))
     }
 }
 
