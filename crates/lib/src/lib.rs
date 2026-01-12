@@ -46,7 +46,7 @@ pub mod prelude {
     #[cfg(feature = "alloc")]
     pub use hayabusa_entrypoint::{default_allocator, entrypoint};
     pub use hayabusa_syscalls as syscalls;
-    pub use hayabusa_sysvars::{self as sysvars, clock::Clock};
+    pub use hayabusa_sysvars::{self as sysvars, clock::Clock, Sysvar};
 
     pub use solana_account_view::{AccountView, Ref, RefMut, self as account_view};
     pub use solana_address::{Address, declare_id, self as address};
