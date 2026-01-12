@@ -3,12 +3,19 @@
 
 use crate::{FromAccountView, ToAccountView, WritableAllowed};
 use core::ops::Deref;
-use hayabusa_common::AccountView;
+use hayabusa_common::{AccountView, Address};
 use hayabusa_errors::{ErrorCode, ProgramError, Result};
 use hayabusa_utility::{error_msg, hint::unlikely};
 
 pub struct Signer<'ix> {
     pub account_view: &'ix AccountView,
+}
+
+impl<'ix> Signer<'ix> {
+    #[inline(always)]
+    pub fn address(&'ix self) -> &'ix Address {
+        self.account_view.address()
+    }
 }
 
 impl<'ix> FromAccountView<'ix> for Signer<'ix> {
