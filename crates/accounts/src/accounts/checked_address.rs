@@ -99,6 +99,15 @@ impl<'ix, T> FromAccountView<'ix> for CheckedAddress<'ix, T> {
     } 
 }
 
+impl<'ix, T> Deref for CheckedAddress<'ix, T> {
+    type Target = AccountView;
+
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        self.account_view
+    }
+}
+
 impl<T> WritableAllowed for CheckedAddress<'_, T> {}
 
 pub struct CheckedAddressMeta<'a> {
