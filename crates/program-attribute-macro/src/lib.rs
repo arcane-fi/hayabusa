@@ -22,13 +22,14 @@ fn expand_program(module: ItemMod) -> SynResult<proc_macro2::TokenStream> {
 
     let mut instruction_structs = Vec::new();
     let mut dispatch_arms = Vec::new();
-    let mut handlers = Vec::new();
+    let mut preserved_items = Vec::new();
 
     for item in items {
-        if let Item::Fn(func) = item {
-            extract_instruction(&func, &mut instruction_structs, &mut dispatch_arms);
-            handlers.push(func);
+        if let Item::Fn(func) = &item {
+            extract_instruction(func, &mut instruction_structs, &mut dispatch_arms);
         }
+
+        preserved_items.push(item);
     }
 
     Ok(quote! {
@@ -39,12 +40,10 @@ fn expand_program(module: ItemMod) -> SynResult<proc_macro2::TokenStream> {
 
         #[cfg(not(feature = "no-entrypoint"))]
         mod #mod_ident {
-            use super::*;
             use super::instruction::*;
 
             default_allocator!();
             nostd_panic_handler!();
-
             program_entrypoint!(dispatcher);
 
             fn dispatcher(
@@ -60,7 +59,7 @@ fn expand_program(module: ItemMod) -> SynResult<proc_macro2::TokenStream> {
                 );
             }
 
-            #(#handlers)*
+            #(#preserved_items)*
         }
     })
 }
