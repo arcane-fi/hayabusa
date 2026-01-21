@@ -18,6 +18,7 @@ pinocchio-log = "0.5.1"
 sha2 = "0.10"
 quote = "1.0"
 proc-macro2 = "1.0"
+heck = "0.5.0"
 syn = "2.0"
 solana-address = "2.0"
 solana-account-view = "1.0"
@@ -51,3 +52,5 @@ hayabusa-sysvars = { version = "0.2.0", path = "crates/sysvars" }
 hayabusa-common = { version = "0.2.0", path = "crates/common" }
 hayabusa-events = { version = "0.2.0", path = "crates/events" }
 hayabusa-events-attribute-macro = { version = "0.2.0", path = "crates/events-attribute-macro" }
+hayabusa-decode-instruction-derive = { version = "0.2.0", path = "crates/decode-instruction-derive" }
+hayabusa-program-attribute-macro = { version = "0.2.0", path = "crates/program-attribute-macro" }

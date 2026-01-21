@@ -1172,6 +1172,7 @@ dependencies = [
  "hayabusa-context",
  "hayabusa-cpi",
  "hayabusa-decode-instruction",
+ "hayabusa-decode-instruction-derive",
  "hayabusa-discriminator",
  "hayabusa-discriminator-derive",
  "hayabusa-entrypoint",
@@ -1184,6 +1185,7 @@ dependencies = [
  "hayabusa-len-derive",
  "hayabusa-owner-program-derive",
  "hayabusa-pda",
+ "hayabusa-program-attribute-macro",
  "hayabusa-ser",
  "hayabusa-ser-derive",
  "hayabusa-syscalls",
@@ -1213,6 +1215,7 @@ dependencies = [
  "hayabusa-common",
  "hayabusa-context",
  "hayabusa-errors",
+ "hayabusa-pda",
  "hayabusa-ser",
  "hayabusa-system-program",
  "hayabusa-utility",
@@ -1256,6 +1259,15 @@ name = "hayabusa-decode-instruction"
 version = "0.2.0"
 dependencies = [
  "hayabusa-errors",
+]
+
+[[package]]
+name = "hayabusa-decode-instruction-derive"
+version = "0.2.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.112",
 ]
 
 [[package]]
@@ -1366,6 +1378,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "hayabusa-program-attribute-macro"
+version = "0.2.0"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.112",
+]
+
+[[package]]
 name = "hayabusa-ser"
 version = "0.2.0"
 dependencies = [
@@ -1446,6 +1468,12 @@ dependencies = [
  "solana-address",
  "solana-program-error 3.0.0",
 ]
+
+[[package]]
+name = "heck"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "hermit-abi"

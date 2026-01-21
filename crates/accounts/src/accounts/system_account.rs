@@ -11,7 +11,7 @@ pub struct SystemAccount<'ix> {
     pub account_view: &'ix AccountView,
 }
 
-impl<'ix> FromAccountView<'ix> for SystemAccount<'ix> {
+unsafe impl<'ix> FromAccountView<'ix> for SystemAccount<'ix> {
     type Meta<'a>
         = NoMeta
     where

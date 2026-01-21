@@ -218,6 +218,7 @@ dependencies = [
  "hayabusa-context",
  "hayabusa-cpi",
  "hayabusa-decode-instruction",
+ "hayabusa-decode-instruction-derive",
  "hayabusa-discriminator",
  "hayabusa-discriminator-derive",
  "hayabusa-entrypoint",
@@ -230,6 +231,7 @@ dependencies = [
  "hayabusa-len-derive",
  "hayabusa-owner-program-derive",
  "hayabusa-pda",
+ "hayabusa-program-attribute-macro",
  "hayabusa-ser",
  "hayabusa-ser-derive",
  "hayabusa-syscalls",
@@ -259,6 +261,7 @@ dependencies = [
  "hayabusa-common",
  "hayabusa-context",
  "hayabusa-errors",
+ "hayabusa-pda",
  "hayabusa-ser",
  "hayabusa-system-program",
  "hayabusa-utility",
@@ -310,6 +313,15 @@ name = "hayabusa-decode-instruction"
 version = "0.2.0"
 dependencies = [
  "hayabusa-errors",
+]
+
+[[package]]
+name = "hayabusa-decode-instruction-derive"
+version = "0.2.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
 ]
 
 [[package]]
@@ -417,6 +429,16 @@ dependencies = [
  "hayabusa-syscalls",
  "solana-address",
  "solana-program-error",
+]
+
+[[package]]
+name = "hayabusa-program-attribute-macro"
+version = "0.2.0"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
 ]
 
 [[package]]

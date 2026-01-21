@@ -18,7 +18,7 @@ impl<'ix> Signer<'ix> {
     }
 }
 
-impl<'ix> FromAccountView<'ix> for Signer<'ix> {
+unsafe impl<'ix> FromAccountView<'ix> for Signer<'ix> {
     type Meta<'a>
         = NoMeta
     where

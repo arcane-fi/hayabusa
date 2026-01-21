@@ -9,7 +9,7 @@ use hayabusa_utility::{error_msg, hint::unlikely};
 
 pub struct Mut<T>(pub T);
 
-impl<'ix, T> FromAccountView<'ix> for Mut<T>
+unsafe impl<'ix, T> FromAccountView<'ix> for Mut<T>
 where
     T: FromAccountView<'ix> + WritableAllowed,
 {

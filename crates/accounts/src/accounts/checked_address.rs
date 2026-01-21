@@ -75,7 +75,7 @@ where
     }
 }
 
-impl<'ix, T> FromAccountView<'ix> for CheckedAddress<'ix, T> {
+unsafe impl<'ix, T> FromAccountView<'ix> for CheckedAddress<'ix, T> {
     type Meta<'a> = CheckedAddressMeta<'a>
     where
         'ix: 'a;

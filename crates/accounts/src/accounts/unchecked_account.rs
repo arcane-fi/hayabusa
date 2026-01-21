@@ -9,7 +9,7 @@ pub struct UncheckedAccount<'ix> {
     pub account_view: &'ix AccountView,
 }
 
-impl<'ix> FromAccountView<'ix> for UncheckedAccount<'ix> {
+unsafe impl<'ix> FromAccountView<'ix> for UncheckedAccount<'ix> {
     type Meta<'a>
         = NoMeta
     where

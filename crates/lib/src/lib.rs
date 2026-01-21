@@ -36,6 +36,8 @@ pub mod prelude {
     pub use hayabusa_utility::{hint::unlikely, take_bytes, *};
     pub use hayabusa_events::*;
     pub use hayabusa_events_attribute_macro::event;
+    pub use hayabusa_decode_instruction_derive::DecodeIx;
+    pub use hayabusa_program_attribute_macro::program;
 
     #[cfg(feature = "std")]
     pub use hayabusa_entrpouint::default_panic_handler;
@@ -53,5 +55,5 @@ pub mod prelude {
     pub use solana_address::{self as address, declare_id, Address};
     pub use solana_program_error::ProgramError;
 
-    pub use pinocchio_log::{self, *};
+    pub use pinocchio_log::{self, *, logger};
 }

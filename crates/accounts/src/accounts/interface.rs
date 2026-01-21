@@ -15,7 +15,7 @@ where
     _phantom: core::marker::PhantomData<T>,
 }
 
-impl<'ix, T> FromAccountView<'ix> for Interface<'ix, T>
+unsafe impl<'ix, T> FromAccountView<'ix> for Interface<'ix, T>
 where
     T: ProgramIds,
 {

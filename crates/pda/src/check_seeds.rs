@@ -7,14 +7,14 @@ use solana_address::{address_eq, Address};
 use solana_program_error::ProgramError;
 
 pub trait CheckSeeds {
-    type Info<'a>;
-    type InitInfo<'a>;
+    type Meta<'a>;
+    type InitMeta<'a>;
 
     const SEED: &'static [u8];
 
-    fn check_pda_seeds(&self, addr: &Address, pda_info: Self::Info<'_>) -> Result<()>;
+    fn check_pda_seeds(&self, addr: &Address, meta: Self::Meta<'_>) -> Result<()>;
 
-    fn check_pda_seeds_init(addr: &Address, pda_info: Self::InitInfo<'_>) -> Result<(Address, u8)>;
+    fn check_pda_seeds_init(addr: &Address, meta: Self::InitMeta<'_>) -> Result<(Address, u8)>;
 }
 
 pub fn check_seeds_against_addr(

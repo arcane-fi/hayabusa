@@ -38,6 +38,8 @@ hayabusa-syscalls.workspace = true
 hayabusa-sysvars.workspace = true
 hayabusa-events.workspace = true
 hayabusa-events-attribute-macro.workspace = true
+hayabusa-decode-instruction-derive.workspace = true
+hayabusa-program-attribute-macro.workspace = true
 solana-account-view.workspace = true
 solana-address = { workspace = true, features = ["decode", "bytemuck"] }
 solana-instruction-view = { workspace = true, features = ["cpi"] }

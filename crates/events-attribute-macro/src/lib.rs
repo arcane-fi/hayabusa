@@ -47,10 +47,12 @@ pub fn event(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
         impl EventBuilder for #name {
             fn emit(&self) {
+                use ::core::{mem::MaybeUninit, ptr::copy_nonoverlapping};
+
                 const __TOTAL_SIZE: usize = #total_size;
 
                 /* ---- raw event buffer ---- */
-                let mut __buf: [u8; __TOTAL_SIZE] = [0u8; __TOTAL_SIZE];
+                let mut __buf = [0u8; __TOTAL_SIZE];
 
                 // discriminator
                 __buf[..8].copy_from_slice(&Self::DISCRIMINATOR);

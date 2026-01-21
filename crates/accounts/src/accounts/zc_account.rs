@@ -96,7 +96,7 @@ where
     }
 }
 
-impl<'ix, T> FromAccountView<'ix> for ZcAccount<'ix, T>
+unsafe impl<'ix, T> FromAccountView<'ix> for ZcAccount<'ix, T>
 where
     T: Zc + Deserialize,
 {
