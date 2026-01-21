@@ -10,12 +10,9 @@ mod counter_program {
     use super::*;
     use super::{UpdateCounter, InitializeCounter};
     
-    fn update_counter<'ix>(ctx: Ctx<'ix, UpdateCounter<'ix>>, amount: u64, _s: &[u8]) -> Result<()> {
+    #[inline(always)]
+    fn update_counter<'ix>(ctx: Ctx<'ix, UpdateCounter<'ix>>, amount: u64) -> Result<()> {
         let mut counter = ctx.counter.try_deserialize_mut()?;
-
-        emit!(TestEvent {
-            value: 1,
-        });
 
         counter.count += amount;
 

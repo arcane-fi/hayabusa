@@ -32,7 +32,7 @@ fn expand_program(module: ItemMod) -> SynResult<proc_macro2::TokenStream> {
     }
 
     Ok(quote! {
-        mod instructions {
+        mod instruction {
             use super::*;
             #(#instruction_structs)*
         }
@@ -40,7 +40,7 @@ fn expand_program(module: ItemMod) -> SynResult<proc_macro2::TokenStream> {
         #[cfg(not(feature = "no-entrypoint"))]
         mod #mod_ident {
             use super::*;
-            use super::instructions::*;
+            use super::instruction::*;
 
             default_allocator!();
             nostd_panic_handler!();
